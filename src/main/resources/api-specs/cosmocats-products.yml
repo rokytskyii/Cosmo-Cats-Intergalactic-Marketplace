@@ -1,0 +1,144 @@
+openapi: 3.0.3
+info:
+  title: CosmoCats Products API
+  version: "1.0.0"
+  description: API contract для CRUD операцій над сутністю Product
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/products:
+    get:
+      summary: Отримати список продуктів
+      responses:
+        '200':
+          description: Список продуктів
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductDTO'
+    post:
+      summary: Створити продукт
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductDTO'
+      responses:
+        '201':
+          description: Створено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDTO'
+        '400':
+          description: Помилка валідації
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/products/{id}:
+    get:
+      summary: Отримати продукт за ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Продукт знайдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDTO'
+        '404':
+          description: Не знайдено
+    put:
+      summary: Оновити продукт
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductDTO'
+      responses:
+        '200':
+          description: Оновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDTO'
+        '400':
+          description: Помилка валідації
+    delete:
+      summary: Видалити продукт
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Видалено
+        '404':
+          description: Не знайдено
+
+components:
+  schemas:
+    ProductDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          minLength: 3
+          maxLength: 100
+          example: "Star Yarn"
+        description:
+          type: string
+          maxLength: 500
+        price:
+          type: number
+          format: double
+          minimum: 0.01
+        categoryId:
+          type: integer
+      required:
+        - name
+        - price
+        - categoryId
+
+    ApiError:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: "Bad Request"
+        message:
+          type: string
+          example: "Validation failed for object 'ProductDTO': Field 'price' must be greater than 0."
+        path:
+          type: string
+          example: "/api/products"
+        timestamp:
+          type: string
+          format: date-time
+        details:
+          type: array
+          items:
+            type: string

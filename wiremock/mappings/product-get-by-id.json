@@ -1,0 +1,22 @@
+{
+    "request": {
+        "method": "GET",
+        "urlPathPattern": "/products/[0-9]+"
+    },
+    "response": {
+        "status": 200,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "jsonBody": {
+            "id": "{{request.path.1}}",
+            "title": "Галактичний Тестовий Продукт",
+            "price": 25.99,
+            "description": "Міжпланетна тестова іграшка",
+            "category": "тестова-категорія"
+        },
+        "transformers": [
+            "response-template"
+        ]
+    }
+}
