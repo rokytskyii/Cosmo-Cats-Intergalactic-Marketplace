@@ -4,9 +4,9 @@ import lombok.Data;
 
 @Data
 public class ExternalProductDTO {
-    private Long id;
-    private String title;
-    private Double price;
-    private String description;
-    private String category;
+  private Long id;
+  private String title;
+  private Double price;
+  private String description;
+  private String category;
 }

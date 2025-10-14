@@ -6,9 +6,9 @@ import lombok.Data;
 
 @Data
 public class CategoryDTO {
-    private Long id;
+  private Long id;
 
-    @NotBlank
-    @Size(min = 2, max = 50)
-    private String name;
+  @NotBlank
+  @Size(min = 2, max = 50)
+  private String name;
 }

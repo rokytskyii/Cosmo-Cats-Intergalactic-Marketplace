@@ -11,22 +11,23 @@ import java.util.List;
 @RequestMapping("/api/external/products")
 public class ExternalProductController {
 
-    private final ExternalProductService externalProductService;
+  private final ExternalProductService externalProductService;
 
-    public ExternalProductController(ExternalProductService externalProductService) {
-        this.externalProductService = externalProductService;
-    }
+  public ExternalProductController(ExternalProductService externalProductService) {
+    this.externalProductService = externalProductService;
+  }
 
-    @GetMapping
-    public ResponseEntity<List<ExternalProductDTO>> getAllExternalProducts() {
-        List<ExternalProductDTO> products = externalProductService.getAllExternalProducts();
-        return ResponseEntity.ok(products);
-    }
+  @GetMapping
+  public ResponseEntity<List<ExternalProductDTO>> getAllExternalProducts() {
+    List<ExternalProductDTO> products = externalProductService.getAllExternalProducts();
+    return ResponseEntity.ok(products);
+  }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ExternalProductDTO> getExternalProductById(@PathVariable Long id) {
-        return externalProductService.getExternalProductById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
+  @GetMapping("/{id}")
+  public ResponseEntity<ExternalProductDTO> getExternalProductById(@PathVariable Long id) {
+    return externalProductService
+        .getExternalProductById(id)
+        .map(ResponseEntity::ok)
+        .orElse(ResponseEntity.notFound().build());
+  }
 }

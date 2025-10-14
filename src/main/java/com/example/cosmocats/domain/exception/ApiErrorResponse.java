@@ -13,18 +13,19 @@ import java.util.List;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiErrorResponse {
-    private int status;
-    private String error;
-    private String message;
-    private String path;
-    private Instant timestamp = Instant.now();
-    private List<String> details;
+  private int status;
+  private String error;
+  private String message;
+  private String path;
+  private Instant timestamp = Instant.now();
+  private List<String> details;
 
-    public ApiErrorResponse(int status, String error, String message, String path) {
-        this(status, error, message, path, Instant.now(), null);
-    }
+  public ApiErrorResponse(int status, String error, String message, String path) {
+    this(status, error, message, path, Instant.now(), null);
+  }
 
-    public ApiErrorResponse(int status, String error, String message, String path, List<String> details) {
-        this(status, error, message, path, Instant.now(), details);
-    }
+  public ApiErrorResponse(
+      int status, String error, String message, String path, List<String> details) {
+    this(status, error, message, path, Instant.now(), details);
+  }
 }

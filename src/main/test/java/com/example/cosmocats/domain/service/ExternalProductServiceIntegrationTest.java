@@ -18,36 +18,37 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Testcontainers
 class ExternalProductServiceIntegrationTest {
 
-    @Container
-    static GenericContainer<?> wiremockContainer = new GenericContainer<>("wiremock/wiremock:latest")
-            .withExposedPorts(8080)
-            .withCommand("--verbose", "--global-response-templating");
+  @Container
+  static GenericContainer<?> wiremockContainer =
+      new GenericContainer<>("wiremock/wiremock:latest")
+          .withExposedPorts(8080)
+          .withCommand("--verbose", "--global-response-templating");
 
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        String baseUrl = "http://" + wiremockContainer.getHost() + ":" + wiremockContainer.getMappedPort(8080);
-        registry.add("external.products.api.url", () -> baseUrl);
-    }
+  @DynamicPropertySource
+  static void configureProperties(DynamicPropertyRegistry registry) {
+    String baseUrl =
+        "http://" + wiremockContainer.getHost() + ":" + wiremockContainer.getMappedPort(8080);
+    registry.add("external.products.api.url", () -> baseUrl);
+  }
 
-    @Autowired
-    private ExternalProductService externalProductService;
+  @Autowired private ExternalProductService externalProductService;
 
-    @Test
-    void shouldFetchExternalProducts() {
-        List<ExternalProductDTO> products = externalProductService.getAllExternalProducts();
+  @Test
+  void shouldFetchExternalProducts() {
+    List<ExternalProductDTO> products = externalProductService.getAllExternalProducts();
 
-        assertThat(products).isNotEmpty();
-        assertThat(products).hasSize(3);
-        assertThat(products.get(0).getTitle()).isEqualTo("Cosmic Cat Food");
-        assertThat(products.get(0).getPrice()).isEqualTo(15.99);
-    }
+    assertThat(products).isNotEmpty();
+    assertThat(products).hasSize(3);
+    assertThat(products.get(0).getTitle()).isEqualTo("Cosmic Cat Food");
+    assertThat(products.get(0).getPrice()).isEqualTo(15.99);
+  }
 
-    @Test
-    void shouldFetchExternalProductById() {
-        var product = externalProductService.getExternalProductById(1L);
+  @Test
+  void shouldFetchExternalProductById() {
+    var product = externalProductService.getExternalProductById(1L);
 
-        assertThat(product).isPresent();
-        assertThat(product.get().getTitle()).isEqualTo("Cosmic Cat Food");
-        assertThat(product.get().getCategory()).isEqualTo("pet-supplies");
-    }
+    assertThat(product).isPresent();
+    assertThat(product.get().getTitle()).isEqualTo("Cosmic Cat Food");
+    assertThat(product.get().getCategory()).isEqualTo("pet-supplies");
+  }
 }

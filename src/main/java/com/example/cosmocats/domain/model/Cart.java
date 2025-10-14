@@ -7,6 +7,6 @@ import java.util.Map;
 
 @Data
 public class Cart {
-    private Long id;
-    private Map<Long, Integer> items = new HashMap<>();
+  private Long id;
+  private Map<Long, Integer> items = new HashMap<>();
 }

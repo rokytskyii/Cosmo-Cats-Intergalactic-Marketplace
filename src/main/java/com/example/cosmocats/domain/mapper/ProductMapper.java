@@ -8,11 +8,11 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
-    ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
+  ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
 
-    @Mapping(target = "category.id", source = "categoryId")
-    Product toDomain(ProductDTO dto);
+  @Mapping(target = "category.id", source = "categoryId")
+  Product toDomain(ProductDTO dto);
 
-    @Mapping(target = "categoryId", source = "category.id")
-    ProductDTO toDto(Product product);
+  @Mapping(target = "categoryId", source = "category.id")
+  ProductDTO toDto(Product product);
 }

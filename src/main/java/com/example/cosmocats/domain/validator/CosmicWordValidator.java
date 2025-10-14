@@ -8,14 +8,13 @@ import java.util.List;
 
 public class CosmicWordValidator implements ConstraintValidator<CosmicWordCheck, String> {
 
-    private final List<String> cosmicWords = Arrays.asList("star", "galaxy", "comet", "moon", "planet", "cosmic",
-            "nebula", "astral");
+  private final List<String> cosmicWords =
+      Arrays.asList("star", "galaxy", "comet", "moon", "planet", "cosmic", "nebula", "astral");
 
-    @Override
-    public boolean isValid(String value, ConstraintValidatorContext context) {
-        if (value == null)
-            return true;
-        String lower = value.toLowerCase();
-        return cosmicWords.stream().anyMatch(lower::contains);
-    }
+  @Override
+  public boolean isValid(String value, ConstraintValidatorContext context) {
+    if (value == null) return true;
+    String lower = value.toLowerCase();
+    return cosmicWords.stream().anyMatch(lower::contains);
+  }
 }

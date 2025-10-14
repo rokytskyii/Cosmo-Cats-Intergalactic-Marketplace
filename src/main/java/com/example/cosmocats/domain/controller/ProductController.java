@@ -19,51 +19,51 @@ import java.util.stream.Collectors;
 @Validated
 public class ProductController {
 
-    private final ProductService productService;
-    private final ProductMapper mapper;
+  private final ProductService productService;
+  private final ProductMapper mapper;
 
-    public ProductController(ProductService productService, ProductMapper mapper) {
-        this.productService = productService;
-        this.mapper = mapper;
-    }
+  public ProductController(ProductService productService, ProductMapper mapper) {
+    this.productService = productService;
+    this.mapper = mapper;
+  }
 
-    @PostMapping
-    public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody ProductDTO dto) {
-        Product toSave = mapper.toDomain(dto);
-        toSave.setCategory(new Category(dto.getCategoryId(), "unknown"));
-        Product saved = productService.save(toSave);
-        ProductDTO out = mapper.toDto(saved);
-        return ResponseEntity.created(URI.create("/api/products/" + saved.getId())).body(out);
-    }
+  @PostMapping
+  public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody ProductDTO dto) {
+    Product toSave = mapper.toDomain(dto);
+    toSave.setCategory(new Category(dto.getCategoryId(), "unknown"));
+    Product saved = productService.save(toSave);
+    ProductDTO out = mapper.toDto(saved);
+    return ResponseEntity.created(URI.create("/api/products/" + saved.getId())).body(out);
+  }
 
-    @GetMapping
-    public ResponseEntity<List<ProductDTO>> listProducts() {
-        List<ProductDTO> dtos = productService.findAll().stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(dtos);
-    }
+  @GetMapping
+  public ResponseEntity<List<ProductDTO>> listProducts() {
+    List<ProductDTO> dtos = productService.findAll().stream().map(mapper::toDto).collect(Collectors.toList());
+    return ResponseEntity.ok(dtos);
+  }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProductDTO> getProduct(@PathVariable Long id) {
-        return productService.findById(id)
-                .map(p -> ResponseEntity.ok(mapper.toDto(p)))
-                .orElse(ResponseEntity.notFound().build());
-    }
+  @GetMapping("/{id}")
+  public ResponseEntity<ProductDTO> getProduct(@PathVariable Long id) {
+    return productService
+        .findById(id)
+        .map(p -> ResponseEntity.ok(mapper.toDto(p)))
+        .orElse(ResponseEntity.notFound().build());
+  }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductDTO dto) {
-        Product toUpdate = mapper.toDomain(dto);
-        toUpdate.setCategory(new Category(dto.getCategoryId(), "unknown"));
-        Product updated = productService.update(id, toUpdate);
-        if (updated == null)
-            return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(mapper.toDto(updated));
-    }
+  @PutMapping("/{id}")
+  public ResponseEntity<ProductDTO> updateProduct(
+      @PathVariable Long id, @Valid @RequestBody ProductDTO dto) {
+    Product toUpdate = mapper.toDomain(dto);
+    toUpdate.setCategory(new Category(dto.getCategoryId(), "unknown"));
+    Product updated = productService.update(id, toUpdate);
+    if (updated == null)
+      return ResponseEntity.notFound().build();
+    return ResponseEntity.ok(mapper.toDto(updated));
+  }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        boolean removed = productService.delete(id);
-        return removed ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
-    }
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+    productService.delete(id);
+    return ResponseEntity.noContent().build();
+  }
 }
