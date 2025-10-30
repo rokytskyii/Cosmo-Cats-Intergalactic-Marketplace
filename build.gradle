@@ -2,11 +2,29 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.6'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.barfuin.gradle.jacocolog' version '3.1.0'
 }
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+ext {
+    minimumCoveragePerFile = 0.8
+    filesExcludedFromCoverage = [
+            "**/*CosmoCatsApplication.*",
+            "**/config/*.*",
+            "**/dto/*.*",
+            "**/model/*.*",
+            "**/exception/*.*",
+            "**/validator/CosmicWordCheck.*",
+    ]
+}
 
 configurations {
     compileOnly {
@@ -18,27 +36,34 @@ repositories {
     mavenCentral()
 }
 
+apply from: "${rootProject.projectDir}/gradle/test.gradle"
+apply from: "${rootProject.projectDir}/gradle/jacoco.gradle"
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-    
-    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
-    
-    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-    
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    
+    implementation 'org.mapstruct:mapstruct:1.6.2'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.2'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.rest-assured:rest-assured:5.3.0'
-    
-    testImplementation 'org.wiremock:wiremock:3.3.1'
+
+    testImplementation "org.wiremock:wiremock-jetty12:3.9.2"
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.6.2'
+    testImplementation 'org.projectlombok:lombok'
 }
 
 tasks.named('test') {
@@ -47,7 +72,7 @@ tasks.named('test') {
 
 compileJava {
     options.compilerArgs += [
-        '-Amapstruct.defaultComponentModel=spring',
-        '-Amapstruct.suppressGeneratorTimestamp=true'
+            '-Amapstruct.defaultComponentModel=spring',
+            '-Amapstruct.suppressGeneratorTimestamp=true'
     ]
 }
