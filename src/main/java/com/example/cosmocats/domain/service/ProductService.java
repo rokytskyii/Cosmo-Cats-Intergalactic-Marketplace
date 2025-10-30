@@ -42,6 +42,7 @@ public class ProductService {
   }
 
   public Product update(Long id, Product updated) {
+    if (updated == null) return null;
     Product existing = store.get(id);
     if (existing == null) return null;
     updated.setId(id);

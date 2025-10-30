@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/v1/products")
 @Validated
 public class ProductController {
 
@@ -33,7 +33,7 @@ public class ProductController {
     toSave.setCategory(new Category(dto.getCategoryId(), "unknown"));
     Product saved = productService.save(toSave);
     ProductDTO out = mapper.toDto(saved);
-    return ResponseEntity.created(URI.create("/api/products/" + saved.getId())).body(out);
+    return ResponseEntity.created(URI.create("/api/v1/products/" + saved.getId())).body(out);
   }
 
   @GetMapping

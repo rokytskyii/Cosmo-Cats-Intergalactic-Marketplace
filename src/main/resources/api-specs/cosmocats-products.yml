@@ -4,7 +4,7 @@ info:
   version: "1.0.0"
   description: API contract для CRUD операцій над сутністю Product
 servers:
-  - url: http://localhost:8080
+  - url: http://localhost:8080/api/v1
 paths:
   /api/products:
     get:
@@ -134,7 +134,7 @@ components:
           example: "Validation failed for object 'ProductDTO': Field 'price' must be greater than 0."
         path:
           type: string
-          example: "/api/products"
+          example: "/api/v1/products"
         timestamp:
           type: string
           format: date-time
