@@ -18,31 +18,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Tag("integration")
 class ProductControllerIT {
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
-    @Test
-    void getAllProducts_ShouldReturnProducts() throws Exception {
-        mockMvc.perform(get("/api/v1/products"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray());
-    }
+  @Test
+  void getAllProducts_ShouldReturnProducts() throws Exception {
+    mockMvc
+        .perform(get("/api/v1/products"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isArray());
+  }
 
-    @Test
-    void createProduct_ShouldCreateAndReturnProduct() throws Exception {
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setName("Star Galaxy Product");
-        productDTO.setDescription("Integration test product");
-        productDTO.setPrice(19.99);
-        productDTO.setCategoryId(1L);
+  @Test
+  void createProduct_ShouldCreateAndReturnProduct() throws Exception {
+    ProductDTO productDTO = new ProductDTO();
+    productDTO.setName("Star Galaxy Product");
+    productDTO.setDescription("Integration test product");
+    productDTO.setPrice(19.99);
+    productDTO.setCategoryId(1L);
 
-        mockMvc.perform(post("/api/v1/products")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(productDTO)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("Star Galaxy Product"));
-    }
+    mockMvc
+        .perform(
+            post("/api/v1/products")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(productDTO)))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.name").value("Star Galaxy Product"));
+  }
 }

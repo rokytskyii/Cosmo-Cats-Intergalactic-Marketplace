@@ -22,41 +22,40 @@ import static org.mockito.Mockito.when;
 @Tag("unit")
 class GlobalExceptionHandlerTest {
 
-    private GlobalExceptionHandler handler = new GlobalExceptionHandler();
+  private GlobalExceptionHandler handler = new GlobalExceptionHandler();
 
-    @Mock
-    private HttpServletRequest request;
+  @Mock private HttpServletRequest request;
 
-    @Test
-    void handleExternalServiceException_ShouldReturnServiceUnavailable() {
-        ExternalServiceException ex = new ExternalServiceException("External service down");
-        when(request.getRequestURI()).thenReturn("/api/products");
+  @Test
+  void handleExternalServiceException_ShouldReturnServiceUnavailable() {
+    ExternalServiceException ex = new ExternalServiceException("External service down");
+    when(request.getRequestURI()).thenReturn("/api/products");
 
-        ResponseEntity<ApiErrorResponse> response = handler.handleExternalServiceException(ex, request);
+    ResponseEntity<ApiErrorResponse> response = handler.handleExternalServiceException(ex, request);
 
-        assertEquals(HttpStatus.SERVICE_UNAVAILABLE, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(503, response.getBody().getStatus());
-    }
+    assertEquals(HttpStatus.SERVICE_UNAVAILABLE, response.getStatusCode());
+    assertNotNull(response.getBody());
+    assertEquals(503, response.getBody().getStatus());
+  }
 
-    @Test
-    void handleConstraintViolation_ShouldReturnBadRequest() {
-        Set<ConstraintViolation<?>> violations = new HashSet<>();
-        ConstraintViolationException ex = new ConstraintViolationException(violations);
-        when(request.getRequestURI()).thenReturn("/api/products");
+  @Test
+  void handleConstraintViolation_ShouldReturnBadRequest() {
+    Set<ConstraintViolation<?>> violations = new HashSet<>();
+    ConstraintViolationException ex = new ConstraintViolationException(violations);
+    when(request.getRequestURI()).thenReturn("/api/products");
 
-        ResponseEntity<ApiErrorResponse> response = handler.handleConstraintViolation(ex, request);
+    ResponseEntity<ApiErrorResponse> response = handler.handleConstraintViolation(ex, request);
 
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    }
+    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+  }
 
-    @Test
-    void handleAllExceptions_ShouldReturnInternalServerError() {
-        Exception ex = new RuntimeException("Unexpected error");
-        when(request.getRequestURI()).thenReturn("/api/products");
+  @Test
+  void handleAllExceptions_ShouldReturnInternalServerError() {
+    Exception ex = new RuntimeException("Unexpected error");
+    when(request.getRequestURI()).thenReturn("/api/products");
 
-        ResponseEntity<ApiErrorResponse> response = handler.handleAll(ex, request);
+    ResponseEntity<ApiErrorResponse> response = handler.handleAll(ex, request);
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-    }
+    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+  }
 }

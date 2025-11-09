@@ -38,7 +38,8 @@ public class ProductController {
 
   @GetMapping
   public ResponseEntity<List<ProductDTO>> listProducts() {
-    List<ProductDTO> dtos = productService.findAll().stream().map(mapper::toDto).collect(Collectors.toList());
+    List<ProductDTO> dtos =
+        productService.findAll().stream().map(mapper::toDto).collect(Collectors.toList());
     return ResponseEntity.ok(dtos);
   }
 
@@ -56,8 +57,7 @@ public class ProductController {
     Product toUpdate = mapper.toDomain(dto);
     toUpdate.setCategory(new Category(dto.getCategoryId(), "unknown"));
     Product updated = productService.update(id, toUpdate);
-    if (updated == null)
-      return ResponseEntity.notFound().build();
+    if (updated == null) return ResponseEntity.notFound().build();
     return ResponseEntity.ok(mapper.toDto(updated));
   }
 

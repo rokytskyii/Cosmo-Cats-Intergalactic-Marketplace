@@ -17,176 +17,180 @@ import static org.junit.jupiter.api.Assertions.*;
 @Tag("unit")
 class ProductServiceTest {
 
-    private ProductService productService;
+  private ProductService productService;
 
-    @BeforeEach
-    void setUp() {
-        productService = new ProductService();
-        clearProductStore();
+  @BeforeEach
+  void setUp() {
+    productService = new ProductService();
+    clearProductStore();
+  }
+
+  private void clearProductStore() {
+    try {
+      var storeField = ProductService.class.getDeclaredField("store");
+      storeField.setAccessible(true);
+      var store = storeField.get(productService);
+      if (store instanceof java.util.Map) {
+        ((java.util.Map<?, ?>) store).clear();
+      }
+
+      var idGenField = ProductService.class.getDeclaredField("idGen");
+      idGenField.setAccessible(true);
+      idGenField.set(productService, new java.util.concurrent.atomic.AtomicLong(1));
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    private void clearProductStore() {
-        try {
-            var storeField = ProductService.class.getDeclaredField("store");
-            storeField.setAccessible(true);
-            var store = storeField.get(productService);
-            if (store instanceof java.util.Map) {
-                ((java.util.Map<?, ?>) store).clear();
-            }
+  @Test
+  void save_ShouldSaveProductWithGeneratedId() {
+    Product product =
+        new Product(
+            null, "Test Product", "Test Description", 10.0, new Category(1L, "Test Category"));
 
-            var idGenField = ProductService.class.getDeclaredField("idGen");
-            idGenField.setAccessible(true);
-            idGenField.set(productService, new java.util.concurrent.atomic.AtomicLong(1));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+    Product saved = productService.save(product);
 
-    @Test
-    void save_ShouldSaveProductWithGeneratedId() {
-        Product product = new Product(null, "Test Product", "Test Description", 10.0,
-                new Category(1L, "Test Category"));
+    assertNotNull(saved.getId());
+    assertEquals("Test Product", saved.getName());
+    assertEquals(10.0, saved.getPrice());
+  }
 
-        Product saved = productService.save(product);
+  @Test
+  void save_ShouldUseExistingId_WhenProductHasId() {
+    Product product =
+        new Product(
+            999L, "Test Product", "Test Description", 10.0, new Category(1L, "Test Category"));
 
-        assertNotNull(saved.getId());
-        assertEquals("Test Product", saved.getName());
-        assertEquals(10.0, saved.getPrice());
-    }
+    Product saved = productService.save(product);
 
-    @Test
-    void save_ShouldUseExistingId_WhenProductHasId() {
-        Product product = new Product(999L, "Test Product", "Test Description", 10.0,
-                new Category(1L, "Test Category"));
+    assertEquals(999L, saved.getId());
+    assertEquals("Test Product", saved.getName());
+  }
 
-        Product saved = productService.save(product);
+  @Test
+  void findById_ShouldReturnProduct_WhenExists() {
+    Product product =
+        new Product(
+            null, "Test Product", "Test Description", 10.0, new Category(1L, "Test Category"));
+    Product saved = productService.save(product);
+    Long productId = saved.getId();
 
-        assertEquals(999L, saved.getId());
-        assertEquals("Test Product", saved.getName());
-    }
+    Optional<Product> found = productService.findById(productId);
 
-    @Test
-    void findById_ShouldReturnProduct_WhenExists() {
-        Product product = new Product(null, "Test Product", "Test Description", 10.0,
-                new Category(1L, "Test Category"));
-        Product saved = productService.save(product);
-        Long productId = saved.getId();
+    assertTrue(found.isPresent());
+    assertEquals(productId, found.get().getId());
+  }
 
-        Optional<Product> found = productService.findById(productId);
+  @Test
+  void findById_ShouldReturnEmpty_WhenNotExists() {
+    Optional<Product> found = productService.findById(999L);
 
-        assertTrue(found.isPresent());
-        assertEquals(productId, found.get().getId());
-    }
+    assertFalse(found.isPresent());
+  }
 
-    @Test
-    void findById_ShouldReturnEmpty_WhenNotExists() {
-        Optional<Product> found = productService.findById(999L);
+  @Test
+  void findAll_ShouldReturnAllProducts() {
+    productService.save(new Product(null, "Product 1", "Desc 1", 10.0, new Category(1L, "Cat1")));
+    productService.save(new Product(null, "Product 2", "Desc 2", 20.0, new Category(2L, "Cat2")));
 
-        assertFalse(found.isPresent());
-    }
+    List<Product> products = productService.findAll();
 
-    @Test
-    void findAll_ShouldReturnAllProducts() {
-        productService.save(new Product(null, "Product 1", "Desc 1", 10.0, new Category(1L, "Cat1")));
-        productService.save(new Product(null, "Product 2", "Desc 2", 20.0, new Category(2L, "Cat2")));
+    assertEquals(2, products.size());
+  }
 
-        List<Product> products = productService.findAll();
+  @Test
+  void findAll_ShouldReturnEmptyList_WhenNoProducts() {
 
-        assertEquals(2, products.size());
-    }
+    List<Product> products = productService.findAll();
 
-    @Test
-    void findAll_ShouldReturnEmptyList_WhenNoProducts() {
+    assertTrue(products.isEmpty());
+    assertEquals(0, products.size());
+  }
 
-        List<Product> products = productService.findAll();
+  @Test
+  void update_ShouldUpdateProduct_WhenExists() {
+    Product original =
+        productService.save(new Product(null, "Original", "Desc", 10.0, new Category(1L, "Cat1")));
+    Long productId = original.getId();
 
-        assertTrue(products.isEmpty());
-        assertEquals(0, products.size());
-    }
+    Product updated = new Product(null, "Updated", "New Desc", 15.0, new Category(2L, "Cat2"));
 
-    @Test
-    void update_ShouldUpdateProduct_WhenExists() {
-        Product original = productService.save(new Product(null, "Original", "Desc", 10.0,
-                new Category(1L, "Cat1")));
-        Long productId = original.getId();
+    Product result = productService.update(productId, updated);
 
-        Product updated = new Product(null, "Updated", "New Desc", 15.0, new Category(2L, "Cat2"));
+    assertNotNull(result);
+    assertEquals(productId, result.getId());
+    assertEquals("Updated", result.getName());
+    assertEquals("New Desc", result.getDescription());
+    assertEquals(15.0, result.getPrice());
+    assertEquals(2L, result.getCategory().getId());
+  }
 
-        Product result = productService.update(productId, updated);
+  @Test
+  void update_ShouldReturnNull_WhenNotExists() {
+    Product updated = new Product(null, "Updated", "Desc", 10.0, new Category(1L, "Cat1"));
 
-        assertNotNull(result);
-        assertEquals(productId, result.getId());
-        assertEquals("Updated", result.getName());
-        assertEquals("New Desc", result.getDescription());
-        assertEquals(15.0, result.getPrice());
-        assertEquals(2L, result.getCategory().getId());
-    }
+    Product result = productService.update(999L, updated);
 
-    @Test
-    void update_ShouldReturnNull_WhenNotExists() {
-        Product updated = new Product(null, "Updated", "Desc", 10.0, new Category(1L, "Cat1"));
+    assertNull(result);
+  }
 
-        Product result = productService.update(999L, updated);
+  @Test
+  void update_ShouldReturnNull_WhenProductIsNull() {
+    Product product =
+        productService.save(new Product(null, "Test", "Desc", 10.0, new Category(1L, "Cat1")));
+    Long productId = product.getId();
 
-        assertNull(result);
-    }
+    Product result = productService.update(productId, null);
 
-    @Test
-    void update_ShouldReturnNull_WhenProductIsNull() {
-        Product product = productService.save(new Product(null, "Test", "Desc", 10.0,
-                new Category(1L, "Cat1")));
-        Long productId = product.getId();
+    assertNull(result);
+  }
 
-        Product result = productService.update(productId, null);
+  @Test
+  void update_ShouldPreserveCategory_WhenUpdatedProductHasNullCategory() {
+    Category originalCategory = new Category(1L, "Original Category");
+    Product original =
+        productService.save(new Product(null, "Original", "Desc", 10.0, originalCategory));
+    Long productId = original.getId();
 
-        assertNull(result);
-    }
+    Product updated = new Product(null, "Updated", "New Desc", 15.0, null);
 
-    @Test
-    void update_ShouldPreserveCategory_WhenUpdatedProductHasNullCategory() {
-        Category originalCategory = new Category(1L, "Original Category");
-        Product original = productService.save(new Product(null, "Original", "Desc", 10.0, originalCategory));
-        Long productId = original.getId();
+    Product result = productService.update(productId, updated);
 
-        Product updated = new Product(null, "Updated", "New Desc", 15.0, null);
+    assertNotNull(result);
+    assertEquals(productId, result.getId());
+    assertEquals("Updated", result.getName());
+    assertEquals(originalCategory, result.getCategory()); // Category should be preserved
+  }
 
-        Product result = productService.update(productId, updated);
+  @Test
+  void delete_ShouldRemoveProduct_WhenExists() {
+    Product product =
+        productService.save(new Product(null, "To Delete", "Desc", 10.0, new Category(1L, "Cat1")));
+    Long productId = product.getId();
 
-        assertNotNull(result);
-        assertEquals(productId, result.getId());
-        assertEquals("Updated", result.getName());
-        assertEquals(originalCategory, result.getCategory()); // Category should be preserved
-    }
+    boolean deleted = productService.delete(productId);
 
-    @Test
-    void delete_ShouldRemoveProduct_WhenExists() {
-        Product product = productService.save(new Product(null, "To Delete", "Desc", 10.0,
-                new Category(1L, "Cat1")));
-        Long productId = product.getId();
+    assertTrue(deleted);
+    assertFalse(productService.findById(productId).isPresent());
+  }
 
-        boolean deleted = productService.delete(productId);
+  @Test
+  void delete_ShouldReturnFalse_WhenNotExists() {
+    boolean deleted = productService.delete(999L);
 
-        assertTrue(deleted);
-        assertFalse(productService.findById(productId).isPresent());
-    }
+    assertFalse(deleted);
+  }
 
-    @Test
-    void delete_ShouldReturnFalse_WhenNotExists() {
-        boolean deleted = productService.delete(999L);
+  @Test
+  void init_ShouldCreateDefaultProducts() {
+    clearProductStore();
 
-        assertFalse(deleted);
-    }
+    productService.init();
 
-    @Test
-    void init_ShouldCreateDefaultProducts() {
-        clearProductStore();
+    List<Product> products = productService.findAll();
 
-        productService.init();
-
-        List<Product> products = productService.findAll();
-
-        assertEquals(2, products.size());
-        assertTrue(products.stream().anyMatch(p -> p.getName().equals("Star Yarn")));
-        assertTrue(products.stream().anyMatch(p -> p.getName().equals("Galaxy Milk")));
-    }
+    assertEquals(2, products.size());
+    assertTrue(products.stream().anyMatch(p -> p.getName().equals("Star Yarn")));
+    assertTrue(products.stream().anyMatch(p -> p.getName().equals("Galaxy Milk")));
+  }
 }

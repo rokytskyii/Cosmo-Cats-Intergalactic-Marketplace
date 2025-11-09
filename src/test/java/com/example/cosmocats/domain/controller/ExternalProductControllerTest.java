@@ -21,66 +21,66 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(ExternalProductController.class)
 class ExternalProductControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-    @MockBean
-    private ExternalProductService externalProductService;
+  @MockBean private ExternalProductService externalProductService;
 
-    @Test
-    void getAllExternalProducts_ShouldReturnProducts() throws Exception {
-        ExternalProductDTO product1 = new ExternalProductDTO();
-        product1.setId(1L);
-        product1.setTitle("Star Product");
-        product1.setPrice(10.0);
+  @Test
+  void getAllExternalProducts_ShouldReturnProducts() throws Exception {
+    ExternalProductDTO product1 = new ExternalProductDTO();
+    product1.setId(1L);
+    product1.setTitle("Star Product");
+    product1.setPrice(10.0);
 
-        ExternalProductDTO product2 = new ExternalProductDTO();
-        product2.setId(2L);
-        product2.setTitle("Galaxy Product");
-        product2.setPrice(20.0);
+    ExternalProductDTO product2 = new ExternalProductDTO();
+    product2.setId(2L);
+    product2.setTitle("Galaxy Product");
+    product2.setPrice(20.0);
 
-        List<ExternalProductDTO> products = Arrays.asList(product1, product2);
-        when(externalProductService.getAllExternalProducts()).thenReturn(products);
+    List<ExternalProductDTO> products = Arrays.asList(product1, product2);
+    when(externalProductService.getAllExternalProducts()).thenReturn(products);
 
-        mockMvc.perform(get("/api/v1/external/products"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].title").value("Star Product"))
-                .andExpect(jsonPath("$[1].id").value(2))
-                .andExpect(jsonPath("$[1].title").value("Galaxy Product"));
-    }
+    mockMvc
+        .perform(get("/api/v1/external/products"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.length()").value(2))
+        .andExpect(jsonPath("$[0].id").value(1))
+        .andExpect(jsonPath("$[0].title").value("Star Product"))
+        .andExpect(jsonPath("$[1].id").value(2))
+        .andExpect(jsonPath("$[1].title").value("Galaxy Product"));
+  }
 
-    @Test
-    void getAllExternalProducts_ShouldReturnEmptyList() throws Exception {
-        when(externalProductService.getAllExternalProducts()).thenReturn(List.of());
+  @Test
+  void getAllExternalProducts_ShouldReturnEmptyList() throws Exception {
+    when(externalProductService.getAllExternalProducts()).thenReturn(List.of());
 
-        mockMvc.perform(get("/api/v1/external/products"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(0));
-    }
+    mockMvc
+        .perform(get("/api/v1/external/products"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.length()").value(0));
+  }
 
-    @Test
-    void getExternalProductById_ShouldReturnProduct_WhenExists() throws Exception {
-        ExternalProductDTO product = new ExternalProductDTO();
-        product.setId(1L);
-        product.setTitle("Cosmic Product");
-        product.setPrice(15.0);
+  @Test
+  void getExternalProductById_ShouldReturnProduct_WhenExists() throws Exception {
+    ExternalProductDTO product = new ExternalProductDTO();
+    product.setId(1L);
+    product.setTitle("Cosmic Product");
+    product.setPrice(15.0);
 
-        when(externalProductService.getExternalProductById(1L)).thenReturn(Optional.of(product));
+    when(externalProductService.getExternalProductById(1L)).thenReturn(Optional.of(product));
 
-        mockMvc.perform(get("/api/v1/external/products/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.title").value("Cosmic Product"))
-                .andExpect(jsonPath("$.price").value(15.0));
-    }
+    mockMvc
+        .perform(get("/api/v1/external/products/1"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(1))
+        .andExpect(jsonPath("$.title").value("Cosmic Product"))
+        .andExpect(jsonPath("$.price").value(15.0));
+  }
 
-    @Test
-    void getExternalProductById_ShouldReturnNotFound_WhenNotExists() throws Exception {
-        when(externalProductService.getExternalProductById(999L)).thenReturn(Optional.empty());
+  @Test
+  void getExternalProductById_ShouldReturnNotFound_WhenNotExists() throws Exception {
+    when(externalProductService.getExternalProductById(999L)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/api/v1/external/products/999"))
-                .andExpect(status().isNotFound());
-    }
+    mockMvc.perform(get("/api/v1/external/products/999")).andExpect(status().isNotFound());
+  }
 }
