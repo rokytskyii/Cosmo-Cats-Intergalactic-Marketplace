@@ -10,26 +10,27 @@ import org.springframework.test.context.TestPropertySource;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@TestPropertySource(properties = {
-        "external.products.api.url=http://invalid-host:9999"
-})
+@TestPropertySource(properties = {"external.products.api.url=http://invalid-host:9999"})
 @Tag("integration")
 class ExternalProductServiceWireMockTest {
 
-    @Autowired
-    private ExternalProductService externalProductService;
+  @Autowired private ExternalProductService externalProductService;
 
-    @Test
-    void getAllExternalProducts_ShouldThrowException_WhenInvalidUrl() {
-        assertThrows(ExternalServiceException.class, () -> {
-            externalProductService.getAllExternalProducts();
+  @Test
+  void getAllExternalProducts_ShouldThrowException_WhenInvalidUrl() {
+    assertThrows(
+        ExternalServiceException.class,
+        () -> {
+          externalProductService.getAllExternalProducts();
         });
-    }
+  }
 
-    @Test
-    void getExternalProductById_ShouldThrowException_WhenInvalidUrl() {
-        assertThrows(ExternalServiceException.class, () -> {
-            externalProductService.getExternalProductById(1L);
+  @Test
+  void getExternalProductById_ShouldThrowException_WhenInvalidUrl() {
+    assertThrows(
+        ExternalServiceException.class,
+        () -> {
+          externalProductService.getExternalProductById(1L);
         });
-    }
+  }
 }

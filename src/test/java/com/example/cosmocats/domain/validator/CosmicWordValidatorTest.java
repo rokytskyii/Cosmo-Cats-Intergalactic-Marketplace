@@ -12,36 +12,36 @@ import static org.junit.jupiter.api.Assertions.*;
 @Tag("unit")
 class CosmicWordValidatorTest {
 
-    private CosmicWordValidator validator;
+  private CosmicWordValidator validator;
 
-    @BeforeEach
-    void setUp() {
-        validator = new CosmicWordValidator();
-    }
+  @BeforeEach
+  void setUp() {
+    validator = new CosmicWordValidator();
+  }
 
-    @Test
-    void isValid_ShouldReturnTrue_WhenContainsCosmicWord() {
-        assertTrue(validator.isValid("Star Product", null));
-        assertTrue(validator.isValid("Galaxy Milk", null));
-        assertTrue(validator.isValid("Cosmic Yarn", null));
-        assertTrue(validator.isValid("Planet Toy", null));
-    }
+  @Test
+  void isValid_ShouldReturnTrue_WhenContainsCosmicWord() {
+    assertTrue(validator.isValid("Star Product", null));
+    assertTrue(validator.isValid("Galaxy Milk", null));
+    assertTrue(validator.isValid("Cosmic Yarn", null));
+    assertTrue(validator.isValid("Planet Toy", null));
+  }
 
-    @Test
-    void isValid_ShouldReturnFalse_WhenNoCosmicWord() {
-        assertFalse(validator.isValid("Regular Product", null));
-        assertFalse(validator.isValid("Simple Item", null));
-    }
+  @Test
+  void isValid_ShouldReturnFalse_WhenNoCosmicWord() {
+    assertFalse(validator.isValid("Regular Product", null));
+    assertFalse(validator.isValid("Simple Item", null));
+  }
 
-    @Test
-    void isValid_ShouldReturnTrue_WhenNull() {
-        assertTrue(validator.isValid(null, null));
-    }
+  @Test
+  void isValid_ShouldReturnTrue_WhenNull() {
+    assertTrue(validator.isValid(null, null));
+  }
 
-    @Test
-    void isValid_ShouldBeCaseInsensitive() {
-        assertTrue(validator.isValid("STAR Product", null));
-        assertTrue(validator.isValid("galaxy product", null));
-        assertTrue(validator.isValid("Cosmic PRODUCT", null));
-    }
+  @Test
+  void isValid_ShouldBeCaseInsensitive() {
+    assertTrue(validator.isValid("STAR Product", null));
+    assertTrue(validator.isValid("galaxy product", null));
+    assertTrue(validator.isValid("Cosmic PRODUCT", null));
+  }
 }

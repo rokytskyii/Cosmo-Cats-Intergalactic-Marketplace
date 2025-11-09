@@ -77,4 +77,17 @@ public class GlobalExceptionHandler {
             null);
     return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
   }
+
+  @ExceptionHandler(FeatureNotAvailableException.class)
+  public ResponseEntity<ApiErrorResponse> handleFeatureNotAvailableException(
+      FeatureNotAvailableException ex, HttpServletRequest request) {
+    ApiErrorResponse body =
+        new ApiErrorResponse(
+            HttpStatus.SERVICE_UNAVAILABLE.value(),
+            HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase(),
+            ex.getMessage(),
+            request.getRequestURI(),
+            List.of("This feature is temporarily unavailable"));
+    return new ResponseEntity<>(body, HttpStatus.SERVICE_UNAVAILABLE);
+  }
 }

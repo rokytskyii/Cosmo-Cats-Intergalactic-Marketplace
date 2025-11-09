@@ -15,19 +15,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Tag("integration")
 class ExternalProductControllerIT {
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-    @Test
-    void getAllExternalProducts_ShouldReturnProducts() throws Exception {
-        mockMvc.perform(get("/api/v1/external/products"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray());
-    }
+  @Test
+  void getAllExternalProducts_ShouldReturnProducts() throws Exception {
+    mockMvc
+        .perform(get("/api/v1/external/products"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isArray());
+  }
 
-    @Test
-    void getExternalProductById_ShouldReturnNotFound_ForInvalidId() throws Exception {
-        mockMvc.perform(get("/api/v1/external/products/999"))
-                .andExpect(status().isOk());
-    }
+  @Test
+  void getExternalProductById_ShouldReturnNotFound_ForInvalidId() throws Exception {
+    mockMvc.perform(get("/api/v1/external/products/999")).andExpect(status().isOk());
+  }
 }

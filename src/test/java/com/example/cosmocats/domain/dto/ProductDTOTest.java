@@ -16,61 +16,61 @@ import static org.junit.jupiter.api.Assertions.*;
 @Tag("unit")
 class ProductDTOTest {
 
-    private Validator validator;
+  private Validator validator;
 
-    @BeforeEach
-    void setUp() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
-    }
+  @BeforeEach
+  void setUp() {
+    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+    validator = factory.getValidator();
+  }
 
-    @Test
-    void shouldValidate_WhenNameContainsCosmicWord() {
-        ProductDTO dto = new ProductDTO();
-        dto.setName("Star Product");
-        dto.setPrice(10.0);
-        dto.setCategoryId(1L);
+  @Test
+  void shouldValidate_WhenNameContainsCosmicWord() {
+    ProductDTO dto = new ProductDTO();
+    dto.setName("Star Product");
+    dto.setPrice(10.0);
+    dto.setCategoryId(1L);
 
-        Set<ConstraintViolation<ProductDTO>> violations = validator.validate(dto);
+    Set<ConstraintViolation<ProductDTO>> violations = validator.validate(dto);
 
-        assertTrue(violations.isEmpty());
-    }
+    assertTrue(violations.isEmpty());
+  }
 
-    @Test
-    void shouldNotValidate_WhenNameDoesNotContainCosmicWord() {
-        ProductDTO dto = new ProductDTO();
-        dto.setName("Regular Product");
-        dto.setPrice(10.0);
-        dto.setCategoryId(1L);
+  @Test
+  void shouldNotValidate_WhenNameDoesNotContainCosmicWord() {
+    ProductDTO dto = new ProductDTO();
+    dto.setName("Regular Product");
+    dto.setPrice(10.0);
+    dto.setCategoryId(1L);
 
-        Set<ConstraintViolation<ProductDTO>> violations = validator.validate(dto);
+    Set<ConstraintViolation<ProductDTO>> violations = validator.validate(dto);
 
-        assertFalse(violations.isEmpty());
-        assertEquals(1, violations.size());
-        assertTrue(violations.iterator().next().getMessage().contains("cosmic word"));
-    }
+    assertFalse(violations.isEmpty());
+    assertEquals(1, violations.size());
+    assertTrue(violations.iterator().next().getMessage().contains("cosmic word"));
+  }
 
-    @Test
-    void shouldNotValidate_WhenPriceIsNull() {
-        ProductDTO dto = new ProductDTO();
-        dto.setName("Star Product");
-        dto.setPrice(null);
-        dto.setCategoryId(1L);
+  @Test
+  void shouldNotValidate_WhenPriceIsNull() {
+    ProductDTO dto = new ProductDTO();
+    dto.setName("Star Product");
+    dto.setPrice(null);
+    dto.setCategoryId(1L);
 
-        Set<ConstraintViolation<ProductDTO>> violations = validator.validate(dto);
+    Set<ConstraintViolation<ProductDTO>> violations = validator.validate(dto);
 
-        assertFalse(violations.isEmpty());
-    }
+    assertFalse(violations.isEmpty());
+  }
 
-    @Test
-    void shouldNotValidate_WhenPriceIsNegative() {
-        ProductDTO dto = new ProductDTO();
-        dto.setName("Star Product");
-        dto.setPrice(-1.0);
-        dto.setCategoryId(1L);
+  @Test
+  void shouldNotValidate_WhenPriceIsNegative() {
+    ProductDTO dto = new ProductDTO();
+    dto.setName("Star Product");
+    dto.setPrice(-1.0);
+    dto.setCategoryId(1L);
 
-        Set<ConstraintViolation<ProductDTO>> violations = validator.validate(dto);
+    Set<ConstraintViolation<ProductDTO>> violations = validator.validate(dto);
 
-        assertFalse(violations.isEmpty());
-    }
+    assertFalse(violations.isEmpty());
+  }
 }
