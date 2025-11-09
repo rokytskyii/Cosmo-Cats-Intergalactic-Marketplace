@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/external/products")
+@RequestMapping("/api/v1/external/products")
 public class ExternalProductController {
 
   private final ExternalProductService externalProductService;
