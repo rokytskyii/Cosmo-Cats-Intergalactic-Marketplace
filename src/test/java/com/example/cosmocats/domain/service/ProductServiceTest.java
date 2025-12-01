@@ -2,87 +2,67 @@ package com.example.cosmocats.domain.service;
 
 import com.example.cosmocats.domain.model.Category;
 import com.example.cosmocats.domain.model.Product;
-import org.junit.jupiter.api.BeforeEach;
+import com.example.cosmocats.domain.repository.CategoryRepository;
+import com.example.cosmocats.domain.repository.ProductRepository;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
 class ProductServiceTest {
 
+  @Mock
+  private ProductRepository productRepository;
+
+  @Mock
+  private CategoryRepository categoryRepository;
+
+  @InjectMocks
   private ProductService productService;
 
-  @BeforeEach
-  void setUp() {
-    productService = new ProductService();
-    clearProductStore();
-  }
-
-  private void clearProductStore() {
-    try {
-      var storeField = ProductService.class.getDeclaredField("store");
-      storeField.setAccessible(true);
-      var store = storeField.get(productService);
-      if (store instanceof java.util.Map) {
-        ((java.util.Map<?, ?>) store).clear();
-      }
-
-      var idGenField = ProductService.class.getDeclaredField("idGen");
-      idGenField.setAccessible(true);
-      idGenField.set(productService, new java.util.concurrent.atomic.AtomicLong(1));
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   @Test
-  void save_ShouldSaveProductWithGeneratedId() {
-    Product product =
-        new Product(
-            null, "Test Product", "Test Description", 10.0, new Category(1L, "Test Category"));
+  void save_ShouldSaveProduct() {
+    Category category = new Category(1L, "Test Category");
+    Product productToSave = new Product(null, "Test Product", "Description", 10.0, category);
+    Product savedProduct = new Product(1L, "Test Product", "Description", 10.0, category);
 
-    Product saved = productService.save(product);
+    when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+    when(productRepository.save(any(Product.class))).thenReturn(savedProduct);
 
-    assertNotNull(saved.getId());
-    assertEquals("Test Product", saved.getName());
-    assertEquals(10.0, saved.getPrice());
-  }
+    Product result = productService.save(productToSave);
 
-  @Test
-  void save_ShouldUseExistingId_WhenProductHasId() {
-    Product product =
-        new Product(
-            999L, "Test Product", "Test Description", 10.0, new Category(1L, "Test Category"));
-
-    Product saved = productService.save(product);
-
-    assertEquals(999L, saved.getId());
-    assertEquals("Test Product", saved.getName());
+    assertNotNull(result.getId());
+    assertEquals("Test Product", result.getName());
+    verify(productRepository, times(1)).save(productToSave);
   }
 
   @Test
   void findById_ShouldReturnProduct_WhenExists() {
-    Product product =
-        new Product(
-            null, "Test Product", "Test Description", 10.0, new Category(1L, "Test Category"));
-    Product saved = productService.save(product);
-    Long productId = saved.getId();
+    Long id = 1L;
+    Product product = new Product(id, "Test", "Desc", 10.0, new Category(1L, "Cat"));
+    when(productRepository.findById(id)).thenReturn(Optional.of(product));
 
-    Optional<Product> found = productService.findById(productId);
+    Optional<Product> found = productService.findById(id);
 
     assertTrue(found.isPresent());
-    assertEquals(productId, found.get().getId());
+    assertEquals(id, found.get().getId());
   }
 
   @Test
   void findById_ShouldReturnEmpty_WhenNotExists() {
+    when(productRepository.findById(999L)).thenReturn(Optional.empty());
+
     Optional<Product> found = productService.findById(999L);
 
     assertFalse(found.isPresent());
@@ -90,107 +70,63 @@ class ProductServiceTest {
 
   @Test
   void findAll_ShouldReturnAllProducts() {
-    productService.save(new Product(null, "Product 1", "Desc 1", 10.0, new Category(1L, "Cat1")));
-    productService.save(new Product(null, "Product 2", "Desc 2", 20.0, new Category(2L, "Cat2")));
+    List<Product> products = List.of(
+            new Product(1L, "P1", "D1", 10.0, null),
+            new Product(2L, "P2", "D2", 20.0, null)
+    );
+    when(productRepository.findAll()).thenReturn(products);
 
-    List<Product> products = productService.findAll();
+    List<Product> result = productService.findAll();
 
-    assertEquals(2, products.size());
-  }
-
-  @Test
-  void findAll_ShouldReturnEmptyList_WhenNoProducts() {
-
-    List<Product> products = productService.findAll();
-
-    assertTrue(products.isEmpty());
-    assertEquals(0, products.size());
+    assertEquals(2, result.size());
   }
 
   @Test
   void update_ShouldUpdateProduct_WhenExists() {
-    Product original =
-        productService.save(new Product(null, "Original", "Desc", 10.0, new Category(1L, "Cat1")));
-    Long productId = original.getId();
+    Long id = 1L;
+    Product existingProduct = new Product(id, "Old Name", "Old Desc", 10.0, new Category(1L, "Cat"));
+    Product updateInfo = new Product(null, "New Name", "New Desc", 15.0, new Category(1L, "Cat"));
 
-    Product updated = new Product(null, "Updated", "New Desc", 15.0, new Category(2L, "Cat2"));
+    when(productRepository.findById(id)).thenReturn(Optional.of(existingProduct));
+    when(productRepository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-    Product result = productService.update(productId, updated);
+    Product result = productService.update(id, updateInfo);
 
     assertNotNull(result);
-    assertEquals(productId, result.getId());
-    assertEquals("Updated", result.getName());
-    assertEquals("New Desc", result.getDescription());
+    assertEquals("New Name", result.getName());
     assertEquals(15.0, result.getPrice());
-    assertEquals(2L, result.getCategory().getId());
+    verify(productRepository).save(existingProduct);
   }
 
   @Test
   void update_ShouldReturnNull_WhenNotExists() {
-    Product updated = new Product(null, "Updated", "Desc", 10.0, new Category(1L, "Cat1"));
+    when(productRepository.findById(999L)).thenReturn(Optional.empty());
 
-    Product result = productService.update(999L, updated);
-
-    assertNull(result);
-  }
-
-  @Test
-  void update_ShouldReturnNull_WhenProductIsNull() {
-    Product product =
-        productService.save(new Product(null, "Test", "Desc", 10.0, new Category(1L, "Cat1")));
-    Long productId = product.getId();
-
-    Product result = productService.update(productId, null);
+    Product result = productService.update(999L, new Product());
 
     assertNull(result);
+    verify(productRepository, never()).save(any());
   }
 
   @Test
-  void update_ShouldPreserveCategory_WhenUpdatedProductHasNullCategory() {
-    Category originalCategory = new Category(1L, "Original Category");
-    Product original =
-        productService.save(new Product(null, "Original", "Desc", 10.0, originalCategory));
-    Long productId = original.getId();
+  void delete_ShouldReturnTrue_WhenExists() {
+    Long id = 1L;
+    when(productRepository.existsById(id)).thenReturn(true);
 
-    Product updated = new Product(null, "Updated", "New Desc", 15.0, null);
-
-    Product result = productService.update(productId, updated);
-
-    assertNotNull(result);
-    assertEquals(productId, result.getId());
-    assertEquals("Updated", result.getName());
-    assertEquals(originalCategory, result.getCategory()); // Category should be preserved
-  }
-
-  @Test
-  void delete_ShouldRemoveProduct_WhenExists() {
-    Product product =
-        productService.save(new Product(null, "To Delete", "Desc", 10.0, new Category(1L, "Cat1")));
-    Long productId = product.getId();
-
-    boolean deleted = productService.delete(productId);
+    boolean deleted = productService.delete(id);
 
     assertTrue(deleted);
-    assertFalse(productService.findById(productId).isPresent());
+    verify(productRepository).deleteById(id);
   }
 
   @Test
   void delete_ShouldReturnFalse_WhenNotExists() {
-    boolean deleted = productService.delete(999L);
+    Long id = 999L;
+    when(productRepository.existsById(id)).thenReturn(false);
+
+    boolean deleted = productService.delete(id);
 
     assertFalse(deleted);
-  }
-
-  @Test
-  void init_ShouldCreateDefaultProducts() {
-    clearProductStore();
-
-    productService.init();
-
-    List<Product> products = productService.findAll();
-
-    assertEquals(2, products.size());
-    assertTrue(products.stream().anyMatch(p -> p.getName().equals("Star Yarn")));
-    assertTrue(products.stream().anyMatch(p -> p.getName().equals("Galaxy Milk")));
+    verify(productRepository, never()).deleteById(any());
   }
 }

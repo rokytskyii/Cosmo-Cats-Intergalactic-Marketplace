@@ -1,0 +1,102 @@
+databaseChangeLog:
+  - changeSet:
+      id: 01-create-categories-table
+      author: rokytskyii
+      changes:
+        - createTable:
+            tableName: categories
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 02-create-products-table
+      author: rokytskyii
+      changes:
+        - createTable:
+            tableName: products
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(500)
+              - column:
+                  name: price
+                  type: double
+                  constraints:
+                    nullable: false
+              - column:
+                  name: category_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_product_category
+                    references: categories(id)
+
+  - changeSet:
+      id: 03-create-orders-table
+      author: rokytskyii
+      changes:
+        - createTable:
+            tableName: orders
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: order_number
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: status
+                  type: varchar(50)
+
+  - changeSet:
+      id: 04-create-order-items-table
+      author: rokytskyii
+      changes:
+        - createTable:
+            tableName: order_items
+            columns:
+              - column:
+                  name: order_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_order_items_order
+                    references: orders(id)
+              - column:
+                  name: product_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_order_items_product
+                    references: products(id)

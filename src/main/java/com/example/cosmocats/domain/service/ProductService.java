@@ -2,56 +2,65 @@ package com.example.cosmocats.domain.service;
 
 import com.example.cosmocats.domain.model.Category;
 import com.example.cosmocats.domain.model.Product;
+import com.example.cosmocats.domain.repository.CategoryRepository;
+import com.example.cosmocats.domain.repository.ProductRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.PostConstruct;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.List;
+import java.util.Optional;
 
 @Service
+@Transactional(readOnly = true) // Транзакції для читання за замовчуванням
 public class ProductService {
 
-  private final Map<Long, Product> store = new ConcurrentHashMap<>();
-  private final AtomicLong idGen = new AtomicLong(1);
+  private final ProductRepository productRepository;
+  private final CategoryRepository categoryRepository;
 
-  @PostConstruct
-  public void init() {
-    Category cat1 = new Category(1L, "AntiGravity");
-    Category cat2 = new Category(2L, "Dairy");
-
-    save(
-        new Product(
-            null, "Star Yarn", "Антигравітаційні клубки ниток - Star edition", 19.99, cat1));
-    save(
-        new Product(null, "Galaxy Milk", "Космічне молоко з молекулами зоряного пилу", 9.99, cat2));
+  public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
+    this.productRepository = productRepository;
+    this.categoryRepository = categoryRepository;
   }
 
+  @Transactional
   public Product save(Product p) {
-    if (p.getId() == null) p.setId(idGen.getAndIncrement());
-    store.put(p.getId(), p);
-    return p;
+    if (p.getCategory() != null && p.getCategory().getId() != null) {
+      Category category = categoryRepository.findById(p.getCategory().getId())
+              .orElseThrow(() -> new RuntimeException("Category not found with id: " + p.getCategory().getId()));
+      p.setCategory(category);
+    }
+    return productRepository.save(p);
   }
 
   public Optional<Product> findById(Long id) {
-    return Optional.ofNullable(store.get(id));
+    return productRepository.findById(id);
   }
 
   public List<Product> findAll() {
-    return new ArrayList<>(store.values());
+    return productRepository.findAll();
   }
 
+  @Transactional
   public Product update(Long id, Product updated) {
-    if (updated == null) return null;
-    Product existing = store.get(id);
-    if (existing == null) return null;
-    updated.setId(id);
-    if (updated.getCategory() == null) updated.setCategory(existing.getCategory());
-    store.put(id, updated);
-    return updated;
+    return productRepository.findById(id)
+            .map(existing -> {
+              existing.setName(updated.getName());
+              existing.setDescription(updated.getDescription());
+              existing.setPrice(updated.getPrice());
+              if (updated.getCategory() != null) {
+                existing.setCategory(updated.getCategory());
+              }
+              return productRepository.save(existing);
+            })
+            .orElse(null);
   }
 
+  @Transactional
   public boolean delete(Long id) {
-    return store.remove(id) != null;
+    if (productRepository.existsById(id)) {
+      productRepository.deleteById(id);
+      return true;
+    }
+    return false;
   }
 }

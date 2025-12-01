@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: 07-insert-default-categories
+      author: rokytskyii
+      changes:
+        - insert:
+            tableName: categories
+            columns:
+              - column:
+                  name: name
+                  value: "Cosmic Gear"
+        - insert:
+            tableName: categories
+            columns:
+              - column:
+                  name: name
+                  value: "Space Food"
