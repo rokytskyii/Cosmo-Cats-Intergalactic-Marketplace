@@ -3,13 +3,13 @@ package com.example.cosmocats.domain.exception;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,77 +17,65 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ApiErrorResponse> handleValidationExceptions(
-      MethodArgumentNotValidException ex, HttpServletRequest request) {
-    List<String> details =
-        ex.getBindingResult().getFieldErrors().stream()
+  public ProblemDetail handleValidationExceptions(
+          MethodArgumentNotValidException ex, HttpServletRequest request) {
+
+    List<String> details = ex.getBindingResult().getFieldErrors().stream()
             .map(fe -> "Field '" + fe.getField() + "': " + fe.getDefaultMessage())
             .collect(Collectors.toList());
 
-    String msg = "Validation failed for object '" + ex.getBindingResult().getObjectName() + "'";
-    ApiErrorResponse body =
-        new ApiErrorResponse(
-            HttpStatus.BAD_REQUEST.value(),
-            HttpStatus.BAD_REQUEST.getReasonPhrase(),
-            msg,
-            request.getRequestURI(),
-            details);
-    return new ResponseEntity<>(body, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Validation failed");
+    problemDetail.setTitle("Bad Request");
+    problemDetail.setInstance(URI.create(request.getRequestURI()));
+    problemDetail.setProperty("errors", details);
+
+    return problemDetail;
   }
 
   @ExceptionHandler(ConstraintViolationException.class)
-  public ResponseEntity<ApiErrorResponse> handleConstraintViolation(
-      ConstraintViolationException ex, HttpServletRequest request) {
-    List<String> details =
-        ex.getConstraintViolations().stream()
+  public ProblemDetail handleConstraintViolation(
+          ConstraintViolationException ex, HttpServletRequest request) {
+
+    List<String> details = ex.getConstraintViolations().stream()
             .map(ConstraintViolation::getMessage)
             .collect(Collectors.toList());
 
-    ApiErrorResponse body =
-        new ApiErrorResponse(
-            HttpStatus.BAD_REQUEST.value(),
-            HttpStatus.BAD_REQUEST.getReasonPhrase(),
-            "Validation failed (constraint violations)",
-            request.getRequestURI(),
-            details);
-    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Constraint violations");
+    problemDetail.setTitle("Bad Request");
+    problemDetail.setInstance(URI.create(request.getRequestURI()));
+    problemDetail.setProperty("errors", details);
+
+    return problemDetail;
   }
 
   @ExceptionHandler(ExternalServiceException.class)
-  public ResponseEntity<ApiErrorResponse> handleExternalServiceException(
-      ExternalServiceException ex, HttpServletRequest request) {
-    ApiErrorResponse body =
-        new ApiErrorResponse(
-            HttpStatus.SERVICE_UNAVAILABLE.value(),
-            HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase(),
-            ex.getMessage(),
-            request.getRequestURI(),
-            List.of("External product service is temporarily unavailable"));
-    return new ResponseEntity<>(body, HttpStatus.SERVICE_UNAVAILABLE);
-  }
+  public ProblemDetail handleExternalServiceException(
+          ExternalServiceException ex, HttpServletRequest request) {
 
-  @ExceptionHandler(Exception.class)
-  public ResponseEntity<ApiErrorResponse> handleAll(Exception ex, HttpServletRequest request) {
-    ApiErrorResponse body =
-        new ApiErrorResponse(
-            HttpStatus.INTERNAL_SERVER_ERROR.value(),
-            HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-            ex.getMessage(),
-            request.getRequestURI(),
-            null);
-    return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+    ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+    problemDetail.setTitle("External Service Error");
+    problemDetail.setInstance(URI.create(request.getRequestURI()));
+
+    return problemDetail;
   }
 
   @ExceptionHandler(FeatureNotAvailableException.class)
-  public ResponseEntity<ApiErrorResponse> handleFeatureNotAvailableException(
-      FeatureNotAvailableException ex, HttpServletRequest request) {
-    ApiErrorResponse body =
-        new ApiErrorResponse(
-            HttpStatus.SERVICE_UNAVAILABLE.value(),
-            HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase(),
-            ex.getMessage(),
-            request.getRequestURI(),
-            List.of("This feature is temporarily unavailable"));
-    return new ResponseEntity<>(body, HttpStatus.SERVICE_UNAVAILABLE);
+  public ProblemDetail handleFeatureNotAvailableException(
+          FeatureNotAvailableException ex, HttpServletRequest request) {
+
+    ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+    problemDetail.setTitle("Feature Disabled");
+    problemDetail.setInstance(URI.create(request.getRequestURI()));
+
+    return problemDetail;
+  }
+
+  @ExceptionHandler(Exception.class)
+  public ProblemDetail handleAll(Exception ex, HttpServletRequest request) {
+    ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+    problemDetail.setTitle("Internal Server Error");
+    problemDetail.setInstance(URI.create(request.getRequestURI()));
+
+    return problemDetail;
   }
 }

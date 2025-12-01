@@ -5,11 +5,7 @@ import com.example.cosmocats.domain.service.FeatureToggleService;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
-import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
-
-import java.lang.reflect.Method;
 
 @Aspect
 @Component
@@ -21,19 +17,12 @@ public class FeatureToggleAspect {
     this.featureToggleService = featureToggleService;
   }
 
-  @Pointcut("@annotation(com.example.cosmocats.domain.aspect.FeatureToggle)")
-  public void featureTogglePointcut() {}
-
-  @Around("featureTogglePointcut()")
-  public Object checkFeatureToggle(ProceedingJoinPoint joinPoint) throws Throwable {
-    MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-    Method method = signature.getMethod();
-    FeatureToggle featureToggle = method.getAnnotation(FeatureToggle.class);
-
+  @Around("@annotation(featureToggle)")
+  public Object checkFeatureToggle(ProceedingJoinPoint joinPoint, FeatureToggle featureToggle) throws Throwable {
     String featureName = featureToggle.value();
 
     if (!featureToggleService.isFeatureEnabled(featureName)) {
-      throw new FeatureNotAvailableException("Feature '" + featureName + "' is currently disabled");
+      throw new FeatureNotAvailableException(featureName);
     }
 
     return joinPoint.proceed();

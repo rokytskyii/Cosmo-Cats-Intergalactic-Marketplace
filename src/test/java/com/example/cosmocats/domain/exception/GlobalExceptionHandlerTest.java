@@ -9,9 +9,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.http.ProblemDetail;
 
+import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 @Tag("unit")
 class GlobalExceptionHandlerTest {
 
-  private GlobalExceptionHandler handler = new GlobalExceptionHandler();
+  private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
 
   @Mock private HttpServletRequest request;
 
@@ -31,11 +31,14 @@ class GlobalExceptionHandlerTest {
     ExternalServiceException ex = new ExternalServiceException("External service down");
     when(request.getRequestURI()).thenReturn("/api/products");
 
-    ResponseEntity<ApiErrorResponse> response = handler.handleExternalServiceException(ex, request);
+    // ЗМІНЕНО: тепер ми очікуємо ProblemDetail, а не ResponseEntity
+    ProblemDetail response = handler.handleExternalServiceException(ex, request);
 
-    assertEquals(HttpStatus.SERVICE_UNAVAILABLE, response.getStatusCode());
-    assertNotNull(response.getBody());
-    assertEquals(503, response.getBody().getStatus());
+    // Перевіряємо поля ProblemDetail
+    assertNotNull(response);
+    assertEquals(HttpStatus.SERVICE_UNAVAILABLE.value(), response.getStatus());
+    assertEquals("External Service Error", response.getTitle());
+    assertEquals(URI.create("/api/products"), response.getInstance());
   }
 
   @Test
@@ -44,9 +47,10 @@ class GlobalExceptionHandlerTest {
     ConstraintViolationException ex = new ConstraintViolationException(violations);
     when(request.getRequestURI()).thenReturn("/api/products");
 
-    ResponseEntity<ApiErrorResponse> response = handler.handleConstraintViolation(ex, request);
+    ProblemDetail response = handler.handleConstraintViolation(ex, request);
 
-    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+    assertEquals("Bad Request", response.getTitle());
   }
 
   @Test
@@ -54,8 +58,9 @@ class GlobalExceptionHandlerTest {
     Exception ex = new RuntimeException("Unexpected error");
     when(request.getRequestURI()).thenReturn("/api/products");
 
-    ResponseEntity<ApiErrorResponse> response = handler.handleAll(ex, request);
+    ProblemDetail response = handler.handleAll(ex, request);
 
-    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getStatus());
+    assertEquals("Internal Server Error", response.getTitle());
   }
 }
