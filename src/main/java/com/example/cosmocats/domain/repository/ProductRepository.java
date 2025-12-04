@@ -1,6 +1,6 @@
 package com.example.cosmocats.domain.repository;
 
-import com.example.cosmocats.domain.model.Product;
+import com.example.cosmocats.entity.Product;
 import com.example.cosmocats.domain.projection.ProductSummaryProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

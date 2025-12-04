@@ -1,8 +1,8 @@
 package com.example.cosmocats.domain.repository;
 
 import com.example.cosmocats.BaseIntegrationTest;
-import com.example.cosmocats.domain.model.Category;
-import com.example.cosmocats.domain.model.Product;
+import com.example.cosmocats.entity.Category;
+import com.example.cosmocats.entity.Product;
 import com.example.cosmocats.domain.projection.ProductSummaryProjection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;

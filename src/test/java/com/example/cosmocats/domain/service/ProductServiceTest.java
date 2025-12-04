@@ -1,7 +1,7 @@
 package com.example.cosmocats.domain.service;
 
-import com.example.cosmocats.domain.model.Category;
-import com.example.cosmocats.domain.model.Product;
+import com.example.cosmocats.entity.Category;
+import com.example.cosmocats.entity.Product;
 import com.example.cosmocats.domain.repository.CategoryRepository;
 import com.example.cosmocats.domain.repository.ProductRepository;
 import org.junit.jupiter.api.Tag;

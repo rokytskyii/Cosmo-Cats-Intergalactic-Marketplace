@@ -1,6 +1,6 @@
 package com.example.cosmocats.domain.repository;
 
-import com.example.cosmocats.domain.model.Category;
+import com.example.cosmocats.entity.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

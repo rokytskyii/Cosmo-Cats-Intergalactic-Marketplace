@@ -1,4 +1,4 @@
-package com.example.cosmocats.domain.model;
+package com.example.cosmocats.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

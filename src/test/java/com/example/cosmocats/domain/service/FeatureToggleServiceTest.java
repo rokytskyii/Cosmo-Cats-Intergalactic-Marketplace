@@ -4,6 +4,7 @@ import com.example.cosmocats.domain.config.FeatureToggleConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -19,12 +20,8 @@ class FeatureToggleServiceTest {
 
   @Mock private FeatureToggleConfig featureToggleConfig;
 
+  @InjectMocks
   private FeatureToggleService featureToggleService;
-
-  @BeforeEach
-  void setUp() {
-    featureToggleService = new FeatureToggleService(featureToggleConfig);
-  }
 
   @Test
   void isFeatureEnabled_WhenFeatureEnabled_ReturnsTrue() {

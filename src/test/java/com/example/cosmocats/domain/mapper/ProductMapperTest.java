@@ -1,8 +1,8 @@
 package com.example.cosmocats.domain.mapper;
 
 import com.example.cosmocats.domain.dto.ProductDTO;
-import com.example.cosmocats.domain.model.Category;
-import com.example.cosmocats.domain.model.Product;
+import com.example.cosmocats.entity.Category;
+import com.example.cosmocats.entity.Product;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

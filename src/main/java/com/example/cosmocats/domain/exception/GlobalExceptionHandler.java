@@ -70,6 +70,17 @@ public class GlobalExceptionHandler {
     return problemDetail;
   }
 
+  @ExceptionHandler(ResourceNotFoundException.class)
+  public ProblemDetail handleResourceNotFoundException(
+          ResourceNotFoundException ex, HttpServletRequest request) {
+
+    ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+    problemDetail.setTitle("Resource Not Found");
+    problemDetail.setInstance(URI.create(request.getRequestURI()));
+
+    return problemDetail;
+  }
+
   @ExceptionHandler(Exception.class)
   public ProblemDetail handleAll(Exception ex, HttpServletRequest request) {
     ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());

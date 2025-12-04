@@ -2,8 +2,8 @@ package com.example.cosmocats.domain.controller;
 
 import com.example.cosmocats.domain.dto.ProductDTO;
 import com.example.cosmocats.domain.mapper.ProductMapper;
-import com.example.cosmocats.domain.model.Category;
-import com.example.cosmocats.domain.model.Product;
+import com.example.cosmocats.entity.Category;
+import com.example.cosmocats.entity.Product;
 import com.example.cosmocats.domain.service.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Tag;
