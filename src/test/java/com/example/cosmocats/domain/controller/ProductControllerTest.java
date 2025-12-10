@@ -2,18 +2,15 @@ package com.example.cosmocats.domain.controller;
 
 import com.example.cosmocats.domain.dto.ProductDTO;
 import com.example.cosmocats.domain.mapper.ProductMapper;
-import com.example.cosmocats.domain.model.Category;
-import com.example.cosmocats.domain.model.Product;
+import com.example.cosmocats.entity.Category;
+import com.example.cosmocats.entity.Product;
 import com.example.cosmocats.domain.service.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -34,9 +31,9 @@ class ProductControllerTest {
 
   @Autowired private MockMvc mockMvc;
 
-  @MockBean private ProductService productService;
+  @MockitoBean private ProductService productService;
 
-  @MockBean private ProductMapper productMapper;
+  @MockitoBean private ProductMapper productMapper;
 
   @Autowired private ObjectMapper objectMapper;
 
@@ -194,7 +191,7 @@ class ProductControllerTest {
                 .content(objectMapper.writeValueAsString(invalidDTO)))
         .andExpect(status().isBadRequest())
         .andExpect(
-            jsonPath("$.details[0]").value(org.hamcrest.Matchers.containsString("cosmic word")));
+                jsonPath("$.errors[0]").value(org.hamcrest.Matchers.containsString("cosmic word")));
   }
 
   private ProductDTO createProductDTO(

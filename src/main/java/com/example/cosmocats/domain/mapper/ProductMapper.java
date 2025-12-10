@@ -1,6 +1,6 @@
 package com.example.cosmocats.domain.mapper;
 
-import com.example.cosmocats.domain.model.Product;
+import com.example.cosmocats.entity.Product;
 import com.example.cosmocats.domain.dto.ProductDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

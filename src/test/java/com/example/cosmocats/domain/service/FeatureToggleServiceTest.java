@@ -4,6 +4,7 @@ import com.example.cosmocats.domain.config.FeatureToggleConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -19,61 +20,45 @@ class FeatureToggleServiceTest {
 
   @Mock private FeatureToggleConfig featureToggleConfig;
 
+  @InjectMocks
   private FeatureToggleService featureToggleService;
-
-  @BeforeEach
-  void setUp() {
-    featureToggleService = new FeatureToggleService(featureToggleConfig);
-  }
 
   @Test
   void isFeatureEnabled_WhenFeatureEnabled_ReturnsTrue() {
-    // Given
     String featureName = "cosmoCats.enabled";
     when(featureToggleConfig.isEnabled(featureName)).thenReturn(true);
 
-    // When
     boolean result = featureToggleService.isFeatureEnabled(featureName);
 
-    // Then
     assertTrue(result);
   }
 
   @Test
   void isFeatureEnabled_WhenFeatureDisabled_ReturnsFalse() {
-    // Given
     String featureName = "kittyProducts.enabled";
     when(featureToggleConfig.isEnabled(featureName)).thenReturn(false);
 
-    // When
     boolean result = featureToggleService.isFeatureEnabled(featureName);
 
-    // Then
     assertFalse(result);
   }
 
   @Test
   void isFeatureEnabled_WhenFeatureNotConfigured_ReturnsFalse() {
-    // Given
     String featureName = "unknown.feature";
     when(featureToggleConfig.isEnabled(featureName)).thenReturn(false);
 
-    // When
     boolean result = featureToggleService.isFeatureEnabled(featureName);
 
-    // Then
     assertFalse(result);
   }
 
-  // Додайте цей тест до FeatureToggleServiceTest.java
   @Test
   void isFeatureEnabled_WithDifferentFeatureNames_ReturnsCorrectValues() {
-    // Given - різні флагами
     when(featureToggleConfig.isEnabled("feature1")).thenReturn(true);
     when(featureToggleConfig.isEnabled("feature2")).thenReturn(false);
     when(featureToggleConfig.isEnabled("feature3")).thenReturn(true);
 
-    // When & Then
     assertTrue(featureToggleService.isFeatureEnabled("feature1"));
     assertFalse(featureToggleService.isFeatureEnabled("feature2"));
     assertTrue(featureToggleService.isFeatureEnabled("feature3"));
@@ -83,13 +68,10 @@ class FeatureToggleServiceTest {
 
   @Test
   void isFeatureEnabled_WithNullFeatureName_ReturnsFalse() {
-    // Given
     when(featureToggleConfig.isEnabled(null)).thenReturn(false);
 
-    // When
     boolean result = featureToggleService.isFeatureEnabled(null);
 
-    // Then
     assertFalse(result);
     verify(featureToggleConfig).isEnabled(null);
   }
