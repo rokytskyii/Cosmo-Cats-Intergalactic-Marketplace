@@ -12,7 +12,6 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    // Custom JPQL Query з використанням Projection
     @Query("SELECT p.name as name, p.price as price, c.name as categoryName " +
             "FROM Product p JOIN p.category c " +
             "WHERE p.price > :minPrice " +

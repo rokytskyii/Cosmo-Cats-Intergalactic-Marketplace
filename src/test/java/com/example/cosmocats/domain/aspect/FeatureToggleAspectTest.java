@@ -25,7 +25,7 @@ class FeatureToggleAspectTest {
   private TestService testService;
 
   @TestComponent
-  @Service // Ensure it's picked up as a candidate for auto-proxying
+  @Service
   static class TestService {
     @FeatureToggle("test.feature")
     public String testMethod() {
@@ -35,22 +35,17 @@ class FeatureToggleAspectTest {
 
   @Test
   void checkFeatureToggle_WhenFeatureEnabled_ProceedsNormally() {
-    // Given
     when(featureToggleService.isFeatureEnabled("test.feature")).thenReturn(true);
 
-    // When
     String result = testService.testMethod();
 
-    // Then
     assertEquals("success", result);
   }
 
   @Test
   void checkFeatureToggle_WhenFeatureDisabled_ThrowsException() {
-    // Given
     when(featureToggleService.isFeatureEnabled("test.feature")).thenReturn(false);
 
-    // When & Then
     FeatureNotAvailableException exception =
             assertThrows(FeatureNotAvailableException.class, () -> testService.testMethod());
 
