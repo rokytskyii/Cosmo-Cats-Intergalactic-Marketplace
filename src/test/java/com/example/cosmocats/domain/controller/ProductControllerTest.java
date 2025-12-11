@@ -1,7 +1,9 @@
 package com.example.cosmocats.domain.controller;
 
+import com.example.cosmocats.domain.config.SecurityConfig;
 import com.example.cosmocats.domain.dto.ProductDTO;
 import com.example.cosmocats.domain.mapper.ProductMapper;
+import com.example.cosmocats.domain.security.ApiKeyAuthFilter;
 import com.example.cosmocats.entity.Category;
 import com.example.cosmocats.entity.Product;
 import com.example.cosmocats.domain.service.ProductService;
@@ -10,9 +12,12 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SuppressWarnings("deprecation")
 @WebMvcTest(ProductController.class)
+@Import({SecurityConfig.class, ApiKeyAuthFilter.class})
 @Tag("unit")
 class ProductControllerTest {
 
@@ -38,6 +44,7 @@ class ProductControllerTest {
   @Autowired private ObjectMapper objectMapper;
 
   @Test
+  @WithMockUser(username = "astrouser")
   void createProduct_ShouldReturnCreated_WhenValidInput() throws Exception {
     ProductDTO inputDTO = createProductDTO(null, "Star Galaxy Product", "Description", 10.0, 1L);
     Product savedProduct = createProduct(1L, "Star Galaxy Product", "Description", 10.0, 1L);

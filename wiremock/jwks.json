@@ -1,0 +1,25 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/.well-known/jwks.json"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "keys": [
+        {
+          "kty": "RSA",
+          "e": "AQAB",
+          "use": "sig",
+          "kid": "cosmo-key-id",
+          "alg": "RS256",
+          "n": "vY_Z_...",
+          "//": "Тут має бути справжній довгий modulus (n) публічного RSA ключа. Для тестів можна згенерувати або використати тестовий"
+        }
+      ]
+    }
+  }
+}
