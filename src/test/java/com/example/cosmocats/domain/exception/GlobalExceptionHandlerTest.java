@@ -31,10 +31,8 @@ class GlobalExceptionHandlerTest {
     ExternalServiceException ex = new ExternalServiceException("External service down");
     when(request.getRequestURI()).thenReturn("/api/products");
 
-    // ЗМІНЕНО: тепер ми очікуємо ProblemDetail, а не ResponseEntity
     ProblemDetail response = handler.handleExternalServiceException(ex, request);
 
-    // Перевіряємо поля ProblemDetail
     assertNotNull(response);
     assertEquals(HttpStatus.SERVICE_UNAVAILABLE.value(), response.getStatus());
     assertEquals("External Service Error", response.getTitle());

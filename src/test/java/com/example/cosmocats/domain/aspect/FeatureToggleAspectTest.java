@@ -17,11 +17,9 @@ import static org.mockito.Mockito.when;
 @Import(FeatureToggleAspectTest.TestService.class)
 class FeatureToggleAspectTest extends BaseIntegrationTest {
 
-  @MockitoSpyBean
-  private FeatureToggleService featureToggleService;
+  @MockitoSpyBean private FeatureToggleService featureToggleService;
 
-  @Autowired
-  private TestService testService;
+  @Autowired private TestService testService;
 
   @TestComponent
   @Service
@@ -46,7 +44,7 @@ class FeatureToggleAspectTest extends BaseIntegrationTest {
     when(featureToggleService.isFeatureEnabled("test.feature")).thenReturn(false);
 
     FeatureNotAvailableException exception =
-            assertThrows(FeatureNotAvailableException.class, () -> testService.testMethod());
+        assertThrows(FeatureNotAvailableException.class, () -> testService.testMethod());
 
     assertEquals("Feature 'test.feature' is currently disabled", exception.getMessage());
   }

@@ -22,14 +22,11 @@ import static org.mockito.Mockito.*;
 @Tag("unit")
 class ProductServiceTest {
 
-  @Mock
-  private ProductRepository productRepository;
+  @Mock private ProductRepository productRepository;
 
-  @Mock
-  private CategoryRepository categoryRepository;
+  @Mock private CategoryRepository categoryRepository;
 
-  @InjectMocks
-  private ProductService productService;
+  @InjectMocks private ProductService productService;
 
   @Test
   void save_ShouldSaveProduct() {
@@ -70,10 +67,8 @@ class ProductServiceTest {
 
   @Test
   void findAll_ShouldReturnAllProducts() {
-    List<Product> products = List.of(
-            new Product(1L, "P1", "D1", 10.0, null),
-            new Product(2L, "P2", "D2", 20.0, null)
-    );
+    List<Product> products =
+        List.of(new Product(1L, "P1", "D1", 10.0, null), new Product(2L, "P2", "D2", 20.0, null));
     when(productRepository.findAll()).thenReturn(products);
 
     List<Product> result = productService.findAll();
@@ -84,11 +79,13 @@ class ProductServiceTest {
   @Test
   void update_ShouldUpdateProduct_WhenExists() {
     Long id = 1L;
-    Product existingProduct = new Product(id, "Old Name", "Old Desc", 10.0, new Category(1L, "Cat"));
+    Product existingProduct =
+        new Product(id, "Old Name", "Old Desc", 10.0, new Category(1L, "Cat"));
     Product updateInfo = new Product(null, "New Name", "New Desc", 15.0, new Category(1L, "Cat"));
 
     when(productRepository.findById(id)).thenReturn(Optional.of(existingProduct));
-    when(productRepository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    when(productRepository.save(any(Product.class)))
+        .thenAnswer(invocation -> invocation.getArgument(0));
 
     Product result = productService.update(id, updateInfo);
 

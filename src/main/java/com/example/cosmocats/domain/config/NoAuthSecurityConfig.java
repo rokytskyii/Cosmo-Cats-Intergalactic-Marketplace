@@ -13,12 +13,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @Profile("no-auth")
 public class NoAuthSecurityConfig {
 
-    @Bean
-    public SecurityFilterChain noAuthFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+  @Bean
+  public SecurityFilterChain noAuthFilterChain(HttpSecurity http) throws Exception {
+    http.csrf(AbstractHttpConfigurer::disable)
+        .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
 
-        return http.build();
-    }
+    return http.build();
+  }
 }

@@ -23,9 +23,9 @@ class ExternalProductControllerIT extends BaseIntegrationTest {
   @Test
   void getAllExternalProducts_ShouldReturnProducts() throws Exception {
     mockMvc
-            .perform(get("/api/v1/external/products"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$").isArray());
+        .perform(get("/api/v1/external/products"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isArray());
   }
 
   @Test

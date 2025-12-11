@@ -46,13 +46,10 @@ class ProductControllerTest {
 
   @Test
   void createProduct_ShouldReturnCreated_WhenValidInput() throws Exception {
-    // Given
     ProductDTO inputDTO = createProductDTO(null, "Star Galaxy Product", "Description", 10.0, 1L);
 
-    // Створюємо окремий об'єкт, який поверне маппер при конвертації DTO -> Entity
     Product productToSave = createProduct(null, "Star Galaxy Product", "Description", 10.0, 1L);
 
-    // Створюємо об'єкт, який поверне сервіс після збереження (вже з ID)
     Product savedProduct = createProduct(1L, "Star Galaxy Product", "Description", 10.0, 1L);
 
     ProductDTO outputDTO = createProductDTO(1L, "Star Galaxy Product", "Description", 10.0, 1L);
@@ -62,16 +59,16 @@ class ProductControllerTest {
     when(productMapper.toDto(any(Product.class))).thenReturn(outputDTO);
 
     mockMvc
-            .perform(
-                    post("/api/v1/products")
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(inputDTO)))
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.id").value(1))
-            .andExpect(jsonPath("$.name").value("Star Galaxy Product"))
-            .andExpect(header().exists("Location"))
-            .andExpect(header().string("Location", "/api/v1/products/1"));
+        .perform(
+            post("/api/v1/products")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(inputDTO)))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.id").value(1))
+        .andExpect(jsonPath("$.name").value("Star Galaxy Product"))
+        .andExpect(header().exists("Location"))
+        .andExpect(header().string("Location", "/api/v1/products/1"));
   }
 
   @Test
@@ -79,12 +76,12 @@ class ProductControllerTest {
     ProductDTO invalidDTO = createProductDTO(null, "Product", "", -1.0, null);
 
     mockMvc
-            .perform(
-                    post("/api/v1/products")
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(invalidDTO)))
-            .andExpect(status().isBadRequest());
+        .perform(
+            post("/api/v1/products")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidDTO)))
+        .andExpect(status().isBadRequest());
   }
 
   @Test
@@ -100,11 +97,11 @@ class ProductControllerTest {
     when(productMapper.toDto(product2)).thenReturn(dto2);
 
     mockMvc
-            .perform(get("/api/v1/products"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.length()").value(2))
-            .andExpect(jsonPath("$[0].id").value(1))
-            .andExpect(jsonPath("$[1].id").value(2));
+        .perform(get("/api/v1/products"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.length()").value(2))
+        .andExpect(jsonPath("$[0].id").value(1))
+        .andExpect(jsonPath("$[1].id").value(2));
   }
 
   @Test
@@ -112,9 +109,9 @@ class ProductControllerTest {
     when(productService.findAll()).thenReturn(List.of());
 
     mockMvc
-            .perform(get("/api/v1/products"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.length()").value(0));
+        .perform(get("/api/v1/products"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.length()").value(0));
   }
 
   @Test
@@ -126,10 +123,10 @@ class ProductControllerTest {
     when(productMapper.toDto(product)).thenReturn(dto);
 
     mockMvc
-            .perform(get("/api/v1/products/1"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(1))
-            .andExpect(jsonPath("$.name").value("Cosmic Product"));
+        .perform(get("/api/v1/products/1"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(1))
+        .andExpect(jsonPath("$.name").value("Cosmic Product"));
   }
 
   @Test
@@ -150,14 +147,14 @@ class ProductControllerTest {
     when(productMapper.toDto(updatedProduct)).thenReturn(outputDTO);
 
     mockMvc
-            .perform(
-                    put("/api/v1/products/1")
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(inputDTO)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(1))
-            .andExpect(jsonPath("$.name").value("Updated Star Product"));
+        .perform(
+            put("/api/v1/products/1")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(inputDTO)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(1))
+        .andExpect(jsonPath("$.name").value("Updated Star Product"));
   }
 
   @Test
@@ -169,12 +166,12 @@ class ProductControllerTest {
     when(productService.update(eq(999L), any(Product.class))).thenReturn(null);
 
     mockMvc
-            .perform(
-                    put("/api/v1/products/999")
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(inputDTO)))
-            .andExpect(status().isNotFound());
+        .perform(
+            put("/api/v1/products/999")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(inputDTO)))
+        .andExpect(status().isNotFound());
   }
 
   @Test
@@ -186,12 +183,12 @@ class ProductControllerTest {
     when(productService.update(eq(999L), any(Product.class))).thenReturn(null);
 
     mockMvc
-            .perform(
-                    put("/api/v1/products/999")
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(inputDTO)))
-            .andExpect(status().isNotFound());
+        .perform(
+            put("/api/v1/products/999")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(inputDTO)))
+        .andExpect(status().isNotFound());
   }
 
   @Test
@@ -204,18 +201,18 @@ class ProductControllerTest {
     ProductDTO invalidDTO = createProductDTO(null, "Regular Product", "Description", 10.0, 1L);
 
     mockMvc
-            .perform(
-                    post("/api/v1/products")
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(invalidDTO)))
-            .andExpect(status().isBadRequest())
-            .andExpect(
-                    jsonPath("$.errors[0]").value(org.hamcrest.Matchers.containsString("cosmic word")));
+        .perform(
+            post("/api/v1/products")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidDTO)))
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            jsonPath("$.errors[0]").value(org.hamcrest.Matchers.containsString("cosmic word")));
   }
 
   private ProductDTO createProductDTO(
-          Long id, String name, String description, Double price, Long categoryId) {
+      Long id, String name, String description, Double price, Long categoryId) {
     ProductDTO dto = new ProductDTO();
     dto.setId(id);
     dto.setName(name);
@@ -226,8 +223,8 @@ class ProductControllerTest {
   }
 
   private Product createProduct(
-          Long id, String name, String description, Double price, Long categoryId) {
+      Long id, String name, String description, Double price, Long categoryId) {
     return new Product(
-            id, name, description, price, new Category(categoryId, "Category " + categoryId));
+        id, name, description, price, new Category(categoryId, "Category " + categoryId));
   }
 }

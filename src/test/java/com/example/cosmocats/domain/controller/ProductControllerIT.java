@@ -40,9 +40,9 @@ class ProductControllerIT extends BaseIntegrationTest {
   @Test
   void getAllProducts_ShouldReturnProducts() throws Exception {
     mockMvc
-            .perform(get("/api/v1/products"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$").isArray());
+        .perform(get("/api/v1/products"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isArray());
   }
 
   @Test
@@ -56,13 +56,13 @@ class ProductControllerIT extends BaseIntegrationTest {
     productDTO.setCategoryId(savedCategory.getId());
 
     mockMvc
-            .perform(
-                    post("/api/v1/products")
-                            .with(csrf()) // Важливо для POST запитів з Security
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(productDTO)))
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.name").value("Star Galaxy Product"))
-            .andExpect(jsonPath("$.categoryId").value(savedCategory.getId()));
+        .perform(
+            post("/api/v1/products")
+                .with(csrf()) // Важливо для POST запитів з Security
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(productDTO)))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.name").value("Star Galaxy Product"))
+        .andExpect(jsonPath("$.categoryId").value(savedCategory.getId()));
   }
 }

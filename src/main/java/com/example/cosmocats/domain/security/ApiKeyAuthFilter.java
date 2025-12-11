@@ -17,24 +17,25 @@ import java.util.Collections;
 @Component
 public class ApiKeyAuthFilter extends OncePerRequestFilter {
 
-    @Value("${app.security.api-key:COSMO_SECRET_KEY}")
-    private String validApiKey;
+  @Value("${app.security.api-key:COSMO_SECRET_KEY}")
+  private String validApiKey;
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+  @Override
+  protected void doFilterInternal(
+      HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+      throws ServletException, IOException {
 
-        String requestApiKey = request.getHeader("X-API-KEY");
+    String requestApiKey = request.getHeader("X-API-KEY");
 
-        if (validApiKey.equals(requestApiKey)) {
-            var auth = new UsernamePasswordAuthenticationToken(
-                    "ApiKeyUser",
-                    null,
-                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_API_USER"))
-            );
-            SecurityContextHolder.getContext().setAuthentication(auth);
-        }
-
-        filterChain.doFilter(request, response);
+    if (validApiKey.equals(requestApiKey)) {
+      var auth =
+          new UsernamePasswordAuthenticationToken(
+              "ApiKeyUser",
+              null,
+              Collections.singletonList(new SimpleGrantedAuthority("ROLE_API_USER")));
+      SecurityContextHolder.getContext().setAuthentication(auth);
     }
+
+    filterChain.doFilter(request, response);
+  }
 }

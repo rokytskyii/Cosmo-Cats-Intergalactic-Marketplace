@@ -13,23 +13,23 @@ import static org.junit.jupiter.api.Assertions.*;
 @Tag("integration")
 class ExternalProductServiceWireMockTest extends BaseIntegrationTest {
 
-    @Autowired private ExternalProductService externalProductService;
+  @Autowired private ExternalProductService externalProductService;
 
-    @Test
-    void getAllExternalProducts_ShouldThrowException_WhenInvalidUrl() {
-        assertThrows(
-                ExternalServiceException.class,
-                () -> {
-                    externalProductService.getAllExternalProducts();
-                });
-    }
+  @Test
+  void getAllExternalProducts_ShouldThrowException_WhenInvalidUrl() {
+    assertThrows(
+        ExternalServiceException.class,
+        () -> {
+          externalProductService.getAllExternalProducts();
+        });
+  }
 
-    @Test
-    void getExternalProductById_ShouldThrowException_WhenInvalidUrl() {
-        assertThrows(
-                ExternalServiceException.class,
-                () -> {
-                    externalProductService.getExternalProductById(1L);
-                });
-    }
+  @Test
+  void getExternalProductById_ShouldThrowException_WhenInvalidUrl() {
+    assertThrows(
+        ExternalServiceException.class,
+        () -> {
+          externalProductService.getExternalProductById(1L);
+        });
+  }
 }

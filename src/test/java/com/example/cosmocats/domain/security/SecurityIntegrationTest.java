@@ -12,19 +12,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class SecurityIntegrationTest extends BaseIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-    @Test
-    void accessProtectedResource_WithoutAuth_ReturnsUnauthorized() throws Exception {
-        mockMvc.perform(get("/api/v1/products"))
-                .andExpect(status().isUnauthorized());
-    }
+  @Test
+  void accessProtectedResource_WithoutAuth_ReturnsUnauthorized() throws Exception {
+    mockMvc.perform(get("/api/v1/products")).andExpect(status().isUnauthorized());
+  }
 
-    @Test
-    void accessProtectedResource_WithApiKey_ReturnsOk() throws Exception {
-        mockMvc.perform(get("/api/v1/products")
-                        .header("X-API-KEY", "COSMO_SECRET_KEY"))
-                .andExpect(status().isOk());
-    }
+  @Test
+  void accessProtectedResource_WithApiKey_ReturnsOk() throws Exception {
+    mockMvc
+        .perform(get("/api/v1/products").header("X-API-KEY", "COSMO_SECRET_KEY"))
+        .andExpect(status().isOk());
+  }
 }

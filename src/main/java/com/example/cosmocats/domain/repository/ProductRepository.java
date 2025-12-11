@@ -12,9 +12,10 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    @Query("SELECT p.name as name, p.price as price, c.name as categoryName " +
-            "FROM Product p JOIN p.category c " +
-            "WHERE p.price > :minPrice " +
-            "ORDER BY p.price DESC")
-    List<ProductSummaryProjection> findExpensiveProducts(@Param("minPrice") Double minPrice);
+  @Query(
+      "SELECT p.name as name, p.price as price, c.name as categoryName "
+          + "FROM Product p JOIN p.category c "
+          + "WHERE p.price > :minPrice "
+          + "ORDER BY p.price DESC")
+  List<ProductSummaryProjection> findExpensiveProducts(@Param("minPrice") Double minPrice);
 }

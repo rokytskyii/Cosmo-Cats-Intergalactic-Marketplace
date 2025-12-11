@@ -46,13 +46,13 @@ class ExternalProductControllerTest {
     when(externalProductService.getAllExternalProducts()).thenReturn(products);
 
     mockMvc
-            .perform(get("/api/v1/external/products"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.length()").value(2))
-            .andExpect(jsonPath("$[0].id").value(1))
-            .andExpect(jsonPath("$[0].title").value("Star Product"))
-            .andExpect(jsonPath("$[1].id").value(2))
-            .andExpect(jsonPath("$[1].title").value("Galaxy Product"));
+        .perform(get("/api/v1/external/products"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.length()").value(2))
+        .andExpect(jsonPath("$[0].id").value(1))
+        .andExpect(jsonPath("$[0].title").value("Star Product"))
+        .andExpect(jsonPath("$[1].id").value(2))
+        .andExpect(jsonPath("$[1].title").value("Galaxy Product"));
   }
 
   @Test
@@ -60,9 +60,9 @@ class ExternalProductControllerTest {
     when(externalProductService.getAllExternalProducts()).thenReturn(List.of());
 
     mockMvc
-            .perform(get("/api/v1/external/products"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.length()").value(0));
+        .perform(get("/api/v1/external/products"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.length()").value(0));
   }
 
   @Test
@@ -75,11 +75,11 @@ class ExternalProductControllerTest {
     when(externalProductService.getExternalProductById(1L)).thenReturn(Optional.of(product));
 
     mockMvc
-            .perform(get("/api/v1/external/products/1"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(1))
-            .andExpect(jsonPath("$.title").value("Cosmic Product"))
-            .andExpect(jsonPath("$.price").value(15.0));
+        .perform(get("/api/v1/external/products/1"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(1))
+        .andExpect(jsonPath("$.title").value("Cosmic Product"))
+        .andExpect(jsonPath("$.price").value(15.0));
   }
 
   @Test

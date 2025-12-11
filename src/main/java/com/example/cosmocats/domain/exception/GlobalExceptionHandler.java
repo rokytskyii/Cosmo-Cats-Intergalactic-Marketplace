@@ -18,13 +18,15 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ProblemDetail handleValidationExceptions(
-          MethodArgumentNotValidException ex, HttpServletRequest request) {
+      MethodArgumentNotValidException ex, HttpServletRequest request) {
 
-    List<String> details = ex.getBindingResult().getFieldErrors().stream()
+    List<String> details =
+        ex.getBindingResult().getFieldErrors().stream()
             .map(fe -> "Field '" + fe.getField() + "': " + fe.getDefaultMessage())
             .collect(Collectors.toList());
 
-    ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Validation failed");
+    ProblemDetail problemDetail =
+        ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Validation failed");
     problemDetail.setTitle("Bad Request");
     problemDetail.setInstance(URI.create(request.getRequestURI()));
     problemDetail.setProperty("errors", details);
@@ -34,13 +36,15 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(ConstraintViolationException.class)
   public ProblemDetail handleConstraintViolation(
-          ConstraintViolationException ex, HttpServletRequest request) {
+      ConstraintViolationException ex, HttpServletRequest request) {
 
-    List<String> details = ex.getConstraintViolations().stream()
+    List<String> details =
+        ex.getConstraintViolations().stream()
             .map(ConstraintViolation::getMessage)
             .collect(Collectors.toList());
 
-    ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Constraint violations");
+    ProblemDetail problemDetail =
+        ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Constraint violations");
     problemDetail.setTitle("Bad Request");
     problemDetail.setInstance(URI.create(request.getRequestURI()));
     problemDetail.setProperty("errors", details);
@@ -50,9 +54,10 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(ExternalServiceException.class)
   public ProblemDetail handleExternalServiceException(
-          ExternalServiceException ex, HttpServletRequest request) {
+      ExternalServiceException ex, HttpServletRequest request) {
 
-    ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+    ProblemDetail problemDetail =
+        ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
     problemDetail.setTitle("External Service Error");
     problemDetail.setInstance(URI.create(request.getRequestURI()));
 
@@ -61,9 +66,10 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(FeatureNotAvailableException.class)
   public ProblemDetail handleFeatureNotAvailableException(
-          FeatureNotAvailableException ex, HttpServletRequest request) {
+      FeatureNotAvailableException ex, HttpServletRequest request) {
 
-    ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+    ProblemDetail problemDetail =
+        ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
     problemDetail.setTitle("Feature Disabled");
     problemDetail.setInstance(URI.create(request.getRequestURI()));
 
@@ -72,9 +78,10 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(ResourceNotFoundException.class)
   public ProblemDetail handleResourceNotFoundException(
-          ResourceNotFoundException ex, HttpServletRequest request) {
+      ResourceNotFoundException ex, HttpServletRequest request) {
 
-    ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+    ProblemDetail problemDetail =
+        ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
     problemDetail.setTitle("Resource Not Found");
     problemDetail.setInstance(URI.create(request.getRequestURI()));
 
@@ -83,7 +90,8 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   public ProblemDetail handleAll(Exception ex, HttpServletRequest request) {
-    ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+    ProblemDetail problemDetail =
+        ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
     problemDetail.setTitle("Internal Server Error");
     problemDetail.setInstance(URI.create(request.getRequestURI()));
 

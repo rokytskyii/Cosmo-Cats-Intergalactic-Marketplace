@@ -19,24 +19,26 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Profile("!no-auth")
 public class SecurityConfig {
 
-    private final ApiKeyAuthFilter apiKeyAuthFilter;
+  private final ApiKeyAuthFilter apiKeyAuthFilter;
 
-    public SecurityConfig(ApiKeyAuthFilter apiKeyAuthFilter) {
-        this.apiKeyAuthFilter = apiKeyAuthFilter;
-    }
+  public SecurityConfig(ApiKeyAuthFilter apiKeyAuthFilter) {
+    this.apiKeyAuthFilter = apiKeyAuthFilter;
+  }
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/error").permitAll() // Дозволяємо Swagger
-                        .anyRequest().authenticated()
-                )
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
-                .addFilterBefore(apiKeyAuthFilter, UsernamePasswordAuthenticationFilter.class);
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http.csrf(AbstractHttpConfigurer::disable)
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/error")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
+        .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+        .addFilterBefore(apiKeyAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+    return http.build();
+  }
 }

@@ -18,7 +18,8 @@ public class ProductService {
   private final ProductRepository productRepository;
   private final CategoryRepository categoryRepository;
 
-  public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
+  public ProductService(
+      ProductRepository productRepository, CategoryRepository categoryRepository) {
     this.productRepository = productRepository;
     this.categoryRepository = categoryRepository;
   }
@@ -26,8 +27,13 @@ public class ProductService {
   @Transactional
   public Product save(Product p) {
     if (p.getCategory() != null && p.getCategory().getId() != null) {
-      Category category = categoryRepository.findById(p.getCategory().getId())
-              .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + p.getCategory().getId()));
+      Category category =
+          categoryRepository
+              .findById(p.getCategory().getId())
+              .orElseThrow(
+                  () ->
+                      new ResourceNotFoundException(
+                          "Category not found with id: " + p.getCategory().getId()));
       p.setCategory(category);
     }
     return productRepository.save(p);
@@ -43,8 +49,10 @@ public class ProductService {
 
   @Transactional
   public Product update(Long id, Product updated) {
-    return productRepository.findById(id)
-            .map(existing -> {
+    return productRepository
+        .findById(id)
+        .map(
+            existing -> {
               existing.setName(updated.getName());
               existing.setDescription(updated.getDescription());
               existing.setPrice(updated.getPrice());
@@ -53,7 +61,7 @@ public class ProductService {
               }
               return productRepository.save(existing);
             })
-            .orElse(null);
+        .orElse(null);
   }
 
   @Transactional
