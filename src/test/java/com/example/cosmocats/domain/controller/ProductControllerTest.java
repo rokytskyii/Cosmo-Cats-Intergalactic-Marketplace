@@ -13,11 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.security.test.context.support.WithMockUser;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,12 +25,14 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SuppressWarnings("deprecation")
 @WebMvcTest(ProductController.class)
 @Import({SecurityConfig.class, ApiKeyAuthFilter.class})
+@WithMockUser(username = "astrouser")
 @Tag("unit")
 class ProductControllerTest {
 
@@ -44,26 +45,33 @@ class ProductControllerTest {
   @Autowired private ObjectMapper objectMapper;
 
   @Test
-  @WithMockUser(username = "astrouser")
   void createProduct_ShouldReturnCreated_WhenValidInput() throws Exception {
+    // Given
     ProductDTO inputDTO = createProductDTO(null, "Star Galaxy Product", "Description", 10.0, 1L);
+
+    // Створюємо окремий об'єкт, який поверне маппер при конвертації DTO -> Entity
+    Product productToSave = createProduct(null, "Star Galaxy Product", "Description", 10.0, 1L);
+
+    // Створюємо об'єкт, який поверне сервіс після збереження (вже з ID)
     Product savedProduct = createProduct(1L, "Star Galaxy Product", "Description", 10.0, 1L);
+
     ProductDTO outputDTO = createProductDTO(1L, "Star Galaxy Product", "Description", 10.0, 1L);
 
-    when(productMapper.toDomain(any(ProductDTO.class))).thenReturn(savedProduct);
+    when(productMapper.toDomain(any(ProductDTO.class))).thenReturn(productToSave);
     when(productService.save(any(Product.class))).thenReturn(savedProduct);
     when(productMapper.toDto(any(Product.class))).thenReturn(outputDTO);
 
     mockMvc
-        .perform(
-            post("/api/v1/products")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(inputDTO)))
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.id").value(1))
-        .andExpect(jsonPath("$.name").value("Star Galaxy Product"))
-        .andExpect(header().exists("Location"))
-        .andExpect(header().string("Location", "/api/v1/products/1"));
+            .perform(
+                    post("/api/v1/products")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(inputDTO)))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id").value(1))
+            .andExpect(jsonPath("$.name").value("Star Galaxy Product"))
+            .andExpect(header().exists("Location"))
+            .andExpect(header().string("Location", "/api/v1/products/1"));
   }
 
   @Test
@@ -71,11 +79,12 @@ class ProductControllerTest {
     ProductDTO invalidDTO = createProductDTO(null, "Product", "", -1.0, null);
 
     mockMvc
-        .perform(
-            post("/api/v1/products")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidDTO)))
-        .andExpect(status().isBadRequest());
+            .perform(
+                    post("/api/v1/products")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(invalidDTO)))
+            .andExpect(status().isBadRequest());
   }
 
   @Test
@@ -91,11 +100,11 @@ class ProductControllerTest {
     when(productMapper.toDto(product2)).thenReturn(dto2);
 
     mockMvc
-        .perform(get("/api/v1/products"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.length()").value(2))
-        .andExpect(jsonPath("$[0].id").value(1))
-        .andExpect(jsonPath("$[1].id").value(2));
+            .perform(get("/api/v1/products"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$[0].id").value(1))
+            .andExpect(jsonPath("$[1].id").value(2));
   }
 
   @Test
@@ -103,9 +112,9 @@ class ProductControllerTest {
     when(productService.findAll()).thenReturn(List.of());
 
     mockMvc
-        .perform(get("/api/v1/products"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.length()").value(0));
+            .perform(get("/api/v1/products"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(0));
   }
 
   @Test
@@ -117,10 +126,10 @@ class ProductControllerTest {
     when(productMapper.toDto(product)).thenReturn(dto);
 
     mockMvc
-        .perform(get("/api/v1/products/1"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.id").value(1))
-        .andExpect(jsonPath("$.name").value("Cosmic Product"));
+            .perform(get("/api/v1/products/1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(1))
+            .andExpect(jsonPath("$.name").value("Cosmic Product"));
   }
 
   @Test
@@ -141,13 +150,14 @@ class ProductControllerTest {
     when(productMapper.toDto(updatedProduct)).thenReturn(outputDTO);
 
     mockMvc
-        .perform(
-            put("/api/v1/products/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(inputDTO)))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.id").value(1))
-        .andExpect(jsonPath("$.name").value("Updated Star Product"));
+            .perform(
+                    put("/api/v1/products/1")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(inputDTO)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(1))
+            .andExpect(jsonPath("$.name").value("Updated Star Product"));
   }
 
   @Test
@@ -159,11 +169,12 @@ class ProductControllerTest {
     when(productService.update(eq(999L), any(Product.class))).thenReturn(null);
 
     mockMvc
-        .perform(
-            put("/api/v1/products/999")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(inputDTO)))
-        .andExpect(status().isNotFound());
+            .perform(
+                    put("/api/v1/products/999")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(inputDTO)))
+            .andExpect(status().isNotFound());
   }
 
   @Test
@@ -175,16 +186,17 @@ class ProductControllerTest {
     when(productService.update(eq(999L), any(Product.class))).thenReturn(null);
 
     mockMvc
-        .perform(
-            put("/api/v1/products/999")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(inputDTO)))
-        .andExpect(status().isNotFound());
+            .perform(
+                    put("/api/v1/products/999")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(inputDTO)))
+            .andExpect(status().isNotFound());
   }
 
   @Test
   void deleteProduct_ShouldReturnNoContent() throws Exception {
-    mockMvc.perform(delete("/api/v1/products/1")).andExpect(status().isNoContent());
+    mockMvc.perform(delete("/api/v1/products/1").with(csrf())).andExpect(status().isNoContent());
   }
 
   @Test
@@ -192,17 +204,18 @@ class ProductControllerTest {
     ProductDTO invalidDTO = createProductDTO(null, "Regular Product", "Description", 10.0, 1L);
 
     mockMvc
-        .perform(
-            post("/api/v1/products")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidDTO)))
-        .andExpect(status().isBadRequest())
-        .andExpect(
-                jsonPath("$.errors[0]").value(org.hamcrest.Matchers.containsString("cosmic word")));
+            .perform(
+                    post("/api/v1/products")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(invalidDTO)))
+            .andExpect(status().isBadRequest())
+            .andExpect(
+                    jsonPath("$.errors[0]").value(org.hamcrest.Matchers.containsString("cosmic word")));
   }
 
   private ProductDTO createProductDTO(
-      Long id, String name, String description, Double price, Long categoryId) {
+          Long id, String name, String description, Double price, Long categoryId) {
     ProductDTO dto = new ProductDTO();
     dto.setId(id);
     dto.setName(name);
@@ -213,8 +226,8 @@ class ProductControllerTest {
   }
 
   private Product createProduct(
-      Long id, String name, String description, Double price, Long categoryId) {
+          Long id, String name, String description, Double price, Long categoryId) {
     return new Product(
-        id, name, description, price, new Category(categoryId, "Category " + categoryId));
+            id, name, description, price, new Category(categoryId, "Category " + categoryId));
   }
 }

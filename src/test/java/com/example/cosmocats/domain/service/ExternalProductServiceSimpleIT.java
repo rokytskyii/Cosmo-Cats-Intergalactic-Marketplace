@@ -1,5 +1,6 @@
 package com.example.cosmocats.domain.service;
 
+import com.example.cosmocats.BaseIntegrationTest;
 import com.example.cosmocats.domain.dto.ExternalProductDTO;
 import com.example.cosmocats.domain.exception.ExternalServiceException;
 import org.junit.jupiter.api.Tag;
@@ -14,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Tag("integration")
-class ExternalProductServiceSimpleIT {
+class ExternalProductServiceSimpleIT extends BaseIntegrationTest {
 
   @Autowired private ExternalProductService externalProductService;
 

@@ -1,10 +1,14 @@
 package com.example.cosmocats.domain.controller;
 
+import com.example.cosmocats.domain.config.SecurityConfig;
 import com.example.cosmocats.domain.dto.ExternalProductDTO;
+import com.example.cosmocats.domain.security.ApiKeyAuthFilter;
 import com.example.cosmocats.domain.service.ExternalProductService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -18,6 +22,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SuppressWarnings("deprecation")
 @WebMvcTest(ExternalProductController.class)
+@Import({SecurityConfig.class, ApiKeyAuthFilter.class})
+@WithMockUser(username = "astrouser")
 class ExternalProductControllerTest {
 
   @Autowired private MockMvc mockMvc;
@@ -40,13 +46,13 @@ class ExternalProductControllerTest {
     when(externalProductService.getAllExternalProducts()).thenReturn(products);
 
     mockMvc
-        .perform(get("/api/v1/external/products"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.length()").value(2))
-        .andExpect(jsonPath("$[0].id").value(1))
-        .andExpect(jsonPath("$[0].title").value("Star Product"))
-        .andExpect(jsonPath("$[1].id").value(2))
-        .andExpect(jsonPath("$[1].title").value("Galaxy Product"));
+            .perform(get("/api/v1/external/products"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$[0].id").value(1))
+            .andExpect(jsonPath("$[0].title").value("Star Product"))
+            .andExpect(jsonPath("$[1].id").value(2))
+            .andExpect(jsonPath("$[1].title").value("Galaxy Product"));
   }
 
   @Test
@@ -54,9 +60,9 @@ class ExternalProductControllerTest {
     when(externalProductService.getAllExternalProducts()).thenReturn(List.of());
 
     mockMvc
-        .perform(get("/api/v1/external/products"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.length()").value(0));
+            .perform(get("/api/v1/external/products"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(0));
   }
 
   @Test
@@ -69,11 +75,11 @@ class ExternalProductControllerTest {
     when(externalProductService.getExternalProductById(1L)).thenReturn(Optional.of(product));
 
     mockMvc
-        .perform(get("/api/v1/external/products/1"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.id").value(1))
-        .andExpect(jsonPath("$.title").value("Cosmic Product"))
-        .andExpect(jsonPath("$.price").value(15.0));
+            .perform(get("/api/v1/external/products/1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(1))
+            .andExpect(jsonPath("$.title").value("Cosmic Product"))
+            .andExpect(jsonPath("$.price").value(15.0));
   }
 
   @Test
