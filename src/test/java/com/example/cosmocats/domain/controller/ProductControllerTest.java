@@ -1,7 +1,9 @@
 package com.example.cosmocats.domain.controller;
 
+import com.example.cosmocats.domain.config.SecurityConfig;
 import com.example.cosmocats.domain.dto.ProductDTO;
 import com.example.cosmocats.domain.mapper.ProductMapper;
+import com.example.cosmocats.domain.security.ApiKeyAuthFilter;
 import com.example.cosmocats.entity.Category;
 import com.example.cosmocats.entity.Product;
 import com.example.cosmocats.domain.service.ProductService;
@@ -10,6 +12,8 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,11 +25,14 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SuppressWarnings("deprecation")
 @WebMvcTest(ProductController.class)
+@Import({SecurityConfig.class, ApiKeyAuthFilter.class})
+@WithMockUser(username = "astrouser")
 @Tag("unit")
 class ProductControllerTest {
 
@@ -40,16 +47,21 @@ class ProductControllerTest {
   @Test
   void createProduct_ShouldReturnCreated_WhenValidInput() throws Exception {
     ProductDTO inputDTO = createProductDTO(null, "Star Galaxy Product", "Description", 10.0, 1L);
+
+    Product productToSave = createProduct(null, "Star Galaxy Product", "Description", 10.0, 1L);
+
     Product savedProduct = createProduct(1L, "Star Galaxy Product", "Description", 10.0, 1L);
+
     ProductDTO outputDTO = createProductDTO(1L, "Star Galaxy Product", "Description", 10.0, 1L);
 
-    when(productMapper.toDomain(any(ProductDTO.class))).thenReturn(savedProduct);
+    when(productMapper.toDomain(any(ProductDTO.class))).thenReturn(productToSave);
     when(productService.save(any(Product.class))).thenReturn(savedProduct);
     when(productMapper.toDto(any(Product.class))).thenReturn(outputDTO);
 
     mockMvc
         .perform(
             post("/api/v1/products")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(inputDTO)))
         .andExpect(status().isCreated())
@@ -66,6 +78,7 @@ class ProductControllerTest {
     mockMvc
         .perform(
             post("/api/v1/products")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidDTO)))
         .andExpect(status().isBadRequest());
@@ -136,6 +149,7 @@ class ProductControllerTest {
     mockMvc
         .perform(
             put("/api/v1/products/1")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(inputDTO)))
         .andExpect(status().isOk())
@@ -154,6 +168,7 @@ class ProductControllerTest {
     mockMvc
         .perform(
             put("/api/v1/products/999")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(inputDTO)))
         .andExpect(status().isNotFound());
@@ -170,6 +185,7 @@ class ProductControllerTest {
     mockMvc
         .perform(
             put("/api/v1/products/999")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(inputDTO)))
         .andExpect(status().isNotFound());
@@ -177,7 +193,7 @@ class ProductControllerTest {
 
   @Test
   void deleteProduct_ShouldReturnNoContent() throws Exception {
-    mockMvc.perform(delete("/api/v1/products/1")).andExpect(status().isNoContent());
+    mockMvc.perform(delete("/api/v1/products/1").with(csrf())).andExpect(status().isNoContent());
   }
 
   @Test
@@ -187,11 +203,12 @@ class ProductControllerTest {
     mockMvc
         .perform(
             post("/api/v1/products")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidDTO)))
         .andExpect(status().isBadRequest())
         .andExpect(
-                jsonPath("$.errors[0]").value(org.hamcrest.Matchers.containsString("cosmic word")));
+            jsonPath("$.errors[0]").value(org.hamcrest.Matchers.containsString("cosmic word")));
   }
 
   private ProductDTO createProductDTO(

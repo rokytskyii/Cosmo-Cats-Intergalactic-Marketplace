@@ -20,8 +20,7 @@ class FeatureToggleServiceTest {
 
   @Mock private FeatureToggleConfig featureToggleConfig;
 
-  @InjectMocks
-  private FeatureToggleService featureToggleService;
+  @InjectMocks private FeatureToggleService featureToggleService;
 
   @Test
   void isFeatureEnabled_WhenFeatureEnabled_ReturnsTrue() {

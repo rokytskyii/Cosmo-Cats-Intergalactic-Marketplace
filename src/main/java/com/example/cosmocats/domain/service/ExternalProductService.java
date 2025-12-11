@@ -16,9 +16,11 @@ public class ExternalProductService {
 
   private final RestClient restClient;
 
-  public ExternalProductService(RestClient.Builder builder,
-                                @Value("${external.products.api.url:http://localhost:8081}") String baseUrl) {
-    this.restClient = builder
+  public ExternalProductService(
+      RestClient.Builder builder,
+      @Value("${external.products.api.url:http://localhost:8081}") String baseUrl) {
+    this.restClient =
+        builder
             .baseUrl(baseUrl)
             .defaultHeader("Content-Type", "application/json")
             .defaultHeader("User-Agent", "CosmoCats-Marketplace/1.0")

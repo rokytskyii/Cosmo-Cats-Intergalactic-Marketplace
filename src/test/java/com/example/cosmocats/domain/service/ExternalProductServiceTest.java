@@ -38,18 +38,20 @@ class ExternalProductServiceTest {
   @BeforeEach
   void setUp() {
     when(requestBodySpecBuilder.baseUrl(anyString())).thenReturn(requestBodySpecBuilder);
-    when(requestBodySpecBuilder.defaultHeader(anyString(), anyString())).thenReturn(requestBodySpecBuilder);
+    when(requestBodySpecBuilder.defaultHeader(anyString(), anyString()))
+        .thenReturn(requestBodySpecBuilder);
     when(requestBodySpecBuilder.build()).thenReturn(restClient);
 
-    externalProductService = new ExternalProductService(requestBodySpecBuilder, "http://localhost:8081");
+    externalProductService =
+        new ExternalProductService(requestBodySpecBuilder, "http://localhost:8081");
   }
 
   @Test
   void getAllExternalProducts_ShouldReturnProducts_WhenSuccessful() {
-    ExternalProductDTO[] products = new ExternalProductDTO[] {
-            createExternalProduct(1L, "Product 1", 10.0),
-            createExternalProduct(2L, "Product 2", 20.0)
-    };
+    ExternalProductDTO[] products =
+        new ExternalProductDTO[] {
+          createExternalProduct(1L, "Product 1", 10.0), createExternalProduct(2L, "Product 2", 20.0)
+        };
 
     when(restClient.get()).thenReturn(requestHeadersUriSpec);
     when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
@@ -80,9 +82,10 @@ class ExternalProductServiceTest {
     when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
     when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
     when(responseSpec.body(ExternalProductDTO[].class))
-            .thenThrow(new RestClientException("Connection failed"));
+        .thenThrow(new RestClientException("Connection failed"));
 
-    assertThrows(ExternalServiceException.class, () -> externalProductService.getAllExternalProducts());
+    assertThrows(
+        ExternalServiceException.class, () -> externalProductService.getAllExternalProducts());
   }
 
   @Test
@@ -118,9 +121,10 @@ class ExternalProductServiceTest {
     when(requestHeadersUriSpec.uri(anyString(), any(Object.class))).thenReturn(requestHeadersSpec);
     when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
     when(responseSpec.body(ExternalProductDTO.class))
-            .thenThrow(new RestClientException("Connection failed"));
+        .thenThrow(new RestClientException("Connection failed"));
 
-    assertThrows(ExternalServiceException.class, () -> externalProductService.getExternalProductById(1L));
+    assertThrows(
+        ExternalServiceException.class, () -> externalProductService.getExternalProductById(1L));
   }
 
   @Test

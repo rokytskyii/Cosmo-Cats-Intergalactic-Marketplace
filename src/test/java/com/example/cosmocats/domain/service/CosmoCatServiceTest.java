@@ -29,7 +29,6 @@ class CosmoCatServiceTest {
     featureToggleService = new FeatureToggleService(featureToggleConfig);
     realCosmoCatService = new CosmoCatService();
 
-    // Створюємо проксі з аспектом для тестування
     FeatureToggleAspect aspect = new FeatureToggleAspect(featureToggleService);
     AspectJProxyFactory factory = new AspectJProxyFactory(realCosmoCatService);
     factory.addAspect(aspect);
@@ -38,13 +37,10 @@ class CosmoCatServiceTest {
 
   @Test
   void getCosmoCats_WhenFeatureEnabled_ReturnsListOfCats() {
-    // Given - флаг увімкнений
     when(featureToggleConfig.isEnabled("cosmoCats.enabled")).thenReturn(true);
 
-    // When - викликаємо метод через проксі
     List<String> result = proxiedCosmoCatService.getCosmoCats();
 
-    // Then - перевіряємо результат
     assertNotNull(result);
     assertFalse(result.isEmpty());
     assertEquals(4, result.size());
@@ -53,16 +49,13 @@ class CosmoCatServiceTest {
     assertTrue(result.contains("Comet Tail"));
     assertTrue(result.contains("Nebula Paws"));
 
-    // Перевіряємо, що мок був викликаний
     verify(featureToggleConfig).isEnabled("cosmoCats.enabled");
   }
 
   @Test
   void getCosmoCats_WhenFeatureDisabled_ThrowsException() {
-    // Given - флаг вимкнений
     when(featureToggleConfig.isEnabled("cosmoCats.enabled")).thenReturn(false);
 
-    // When & Then - очікуємо виключення
     FeatureNotAvailableException exception =
         assertThrows(
             FeatureNotAvailableException.class, () -> proxiedCosmoCatService.getCosmoCats());
@@ -74,13 +67,10 @@ class CosmoCatServiceTest {
 
   @Test
   void getKittyProducts_WhenFeatureEnabled_ReturnsListOfProducts() {
-    // Given - флаг увімкнений
     when(featureToggleConfig.isEnabled("kittyProducts.enabled")).thenReturn(true);
 
-    // When - викликаємо метод через проксі
     List<String> result = proxiedCosmoCatService.getKittyProducts();
 
-    // Then - перевіряємо результат
     assertNotNull(result);
     assertFalse(result.isEmpty());
     assertEquals(3, result.size());
@@ -93,10 +83,8 @@ class CosmoCatServiceTest {
 
   @Test
   void getKittyProducts_WhenFeatureDisabled_ThrowsException() {
-    // Given - флаг вимкнений
     when(featureToggleConfig.isEnabled("kittyProducts.enabled")).thenReturn(false);
 
-    // When & Then - очікуємо виключення
     FeatureNotAvailableException exception =
         assertThrows(
             FeatureNotAvailableException.class, () -> proxiedCosmoCatService.getKittyProducts());
@@ -108,14 +96,11 @@ class CosmoCatServiceTest {
 
   @Test
   void getCosmoCats_DirectCall_ReturnsListOfCats() {
-    // When - викликаємо метод напряму (без аспекту)
     List<String> result = realCosmoCatService.getCosmoCats();
 
-    // Then - перевіряємо результат
     assertNotNull(result);
     assertFalse(result.isEmpty());
     assertEquals(4, result.size());
-    // Перевіряємо конкретний вміст списку
     assertEquals("Astro Cat", result.get(0));
     assertEquals("Galaxy Whiskers", result.get(1));
     assertEquals("Comet Tail", result.get(2));
@@ -124,10 +109,8 @@ class CosmoCatServiceTest {
 
   @Test
   void getKittyProducts_DirectCall_ReturnsListOfProducts() {
-    // When - викликаємо метод напряму (без аспекту)
     List<String> result = realCosmoCatService.getKittyProducts();
 
-    // Then - перевіряємо результат
     assertNotNull(result);
     assertFalse(result.isEmpty());
     assertEquals(3, result.size());
@@ -139,7 +122,6 @@ class CosmoCatServiceTest {
 
   @Test
   void serviceInitialization_ShouldWork() {
-    // Проста перевірка, що сервіс може бути створений
     assertNotNull(realCosmoCatService);
     assertNotNull(proxiedCosmoCatService);
     assertNotNull(featureToggleService);
@@ -147,19 +129,15 @@ class CosmoCatServiceTest {
 
   @Test
   void getCosmoCats_ReturnsImmutableList() {
-    // When
     List<String> result = realCosmoCatService.getCosmoCats();
 
-    // Then - перевіряємо, що список не можна змінити
     assertThrows(UnsupportedOperationException.class, () -> result.add("New Cat"));
   }
 
   @Test
   void getKittyProducts_ReturnsImmutableList() {
-    // When
     List<String> result = realCosmoCatService.getKittyProducts();
 
-    // Then - перевіряємо, що список не можна змінити
     assertThrows(UnsupportedOperationException.class, () -> result.add("New Product"));
   }
 }

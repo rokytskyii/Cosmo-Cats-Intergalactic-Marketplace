@@ -1,10 +1,10 @@
 package com.example.cosmocats.domain.aspect;
 
+import com.example.cosmocats.BaseIntegrationTest;
 import com.example.cosmocats.domain.exception.FeatureNotAvailableException;
 import com.example.cosmocats.domain.service.FeatureToggleService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestComponent;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.context.annotation.Import;
@@ -14,15 +14,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
 @Import(FeatureToggleAspectTest.TestService.class)
-class FeatureToggleAspectTest {
+class FeatureToggleAspectTest extends BaseIntegrationTest {
 
-  @MockitoSpyBean
-  private FeatureToggleService featureToggleService;
+  @MockitoSpyBean private FeatureToggleService featureToggleService;
 
-  @Autowired
-  private TestService testService;
+  @Autowired private TestService testService;
 
   @TestComponent
   @Service
@@ -47,7 +44,7 @@ class FeatureToggleAspectTest {
     when(featureToggleService.isFeatureEnabled("test.feature")).thenReturn(false);
 
     FeatureNotAvailableException exception =
-            assertThrows(FeatureNotAvailableException.class, () -> testService.testMethod());
+        assertThrows(FeatureNotAvailableException.class, () -> testService.testMethod());
 
     assertEquals("Feature 'test.feature' is currently disabled", exception.getMessage());
   }

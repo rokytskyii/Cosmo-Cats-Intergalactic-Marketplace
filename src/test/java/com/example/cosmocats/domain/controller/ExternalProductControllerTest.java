@@ -1,10 +1,14 @@
 package com.example.cosmocats.domain.controller;
 
+import com.example.cosmocats.domain.config.SecurityConfig;
 import com.example.cosmocats.domain.dto.ExternalProductDTO;
+import com.example.cosmocats.domain.security.ApiKeyAuthFilter;
 import com.example.cosmocats.domain.service.ExternalProductService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -18,6 +22,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SuppressWarnings("deprecation")
 @WebMvcTest(ExternalProductController.class)
+@Import({SecurityConfig.class, ApiKeyAuthFilter.class})
+@WithMockUser(username = "astrouser")
 class ExternalProductControllerTest {
 
   @Autowired private MockMvc mockMvc;

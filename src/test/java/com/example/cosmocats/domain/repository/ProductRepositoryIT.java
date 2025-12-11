@@ -16,36 +16,36 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Tag("integration")
 class ProductRepositoryIT extends BaseIntegrationTest {
 
-    @Autowired private ProductRepository productRepository;
-    @Autowired private CategoryRepository categoryRepository;
+  @Autowired private ProductRepository productRepository;
+  @Autowired private CategoryRepository categoryRepository;
 
-    @BeforeEach
-    void setUp() {
-        productRepository.deleteAll();
-        categoryRepository.deleteAll();
-    }
+  @BeforeEach
+  void setUp() {
+    productRepository.deleteAll();
+    categoryRepository.deleteAll();
+  }
 
-    @Test
-    void shouldSaveAndFindProduct() {
-        Category category = new Category(null, "Space Food");
-        Category savedCat = categoryRepository.save(category);
+  @Test
+  void shouldSaveAndFindProduct() {
+    Category category = new Category(null, "Space Food");
+    Category savedCat = categoryRepository.save(category);
 
-        Product product = new Product(null, "Test Product", "Desc", 100.0, savedCat);
-        Product saved = productRepository.save(product);
+    Product product = new Product(null, "Test Product", "Desc", 100.0, savedCat);
+    Product saved = productRepository.save(product);
 
-        assertThat(saved.getId()).isNotNull();
-        assertThat(productRepository.findById(saved.getId())).isPresent();
-    }
+    assertThat(saved.getId()).isNotNull();
+    assertThat(productRepository.findById(saved.getId())).isPresent();
+  }
 
-    @Test
-    void shouldExecuteCustomProjectionQuery() {
-        Category cat = categoryRepository.save(new Category(null, "Luxury"));
-        productRepository.save(new Product(null, "Cheap", "Desc", 5.0, cat));
-        productRepository.save(new Product(null, "Expensive", "Desc", 100.0, cat));
+  @Test
+  void shouldExecuteCustomProjectionQuery() {
+    Category cat = categoryRepository.save(new Category(null, "Luxury"));
+    productRepository.save(new Product(null, "Cheap", "Desc", 5.0, cat));
+    productRepository.save(new Product(null, "Expensive", "Desc", 100.0, cat));
 
-        List<ProductSummaryProjection> result = productRepository.findExpensiveProducts(50.0);
+    List<ProductSummaryProjection> result = productRepository.findExpensiveProducts(50.0);
 
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getName()).isEqualTo("Expensive");
-    }
+    assertThat(result).hasSize(1);
+    assertThat(result.get(0).getName()).isEqualTo("Expensive");
+  }
 }

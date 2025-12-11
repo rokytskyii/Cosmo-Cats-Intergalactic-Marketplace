@@ -1,6 +1,7 @@
 package com.example.cosmocats.domain.service;
 
 import com.example.cosmocats.domain.aspect.FeatureToggle;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,6 +13,7 @@ public class CosmoCatService {
   public static final String FEATURE_KITTY_PRODUCTS = "kittyProducts.enabled";
 
   @FeatureToggle(FEATURE_COSMO_CATS)
+  @PreAuthorize("hasAuthority('SCOPE_read') or hasRole('API_USER')")
   public List<String> getCosmoCats() {
     return List.of("Astro Cat", "Galaxy Whiskers", "Comet Tail", "Nebula Paws");
   }
